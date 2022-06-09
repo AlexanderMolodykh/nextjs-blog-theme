@@ -27,14 +27,14 @@ net.pipe//pipe/service
 - Transport determines the underlying transport protocol to use when sending messages to the endpoint: HTTP, TCP, NamedPipe, Peer2Peer, MSMQ.
 
 
-Supported bindings and its characteristics are shown [http://msdn.microsoft.com/en-us/library/ms730879(v=vs.110).aspx](here)
+Supported bindings and its characteristics are shown [here](http://msdn.microsoft.com/en-us/library/ms730879(v=vs.110).aspx)
 
 
 **Contract** is a way to describe what service does.
 - Service contract describes an operations that service can perform.
 - Data Contract defines which data types are passed to and from the service.
 - Fault contracts defines errors raised by the service.
-- Message contracts contains Data like a DatContract, however, it allows to control the structure of SOAP message, e.g. what data should be in header and what in body, or element names. It also makes some restrictions on operation syntax.  [http://msdn.microsoft.com/en-us/library/ms730255(v=vs.110).aspx](MessageContract)
+- Message contracts contains Data like a DatContract, however, it allows to control the structure of SOAP message, e.g. what data should be in header and what in body, or element names. It also makes some restrictions on operation syntax.  [MessageContract](http://msdn.microsoft.com/en-us/library/ms730255(v=vs.110).aspx)
 - Collection data contract allows to control xml representation of collections precisely.
 
 ```cs
@@ -131,7 +131,7 @@ catch (FaultException&lt;SomeFault&gt; e).
 
 
 
-##Message Patterns in WCF
+## Message Patterns in WCF
 **Request-Reply Pattern** is a syncronous way of comunication. The client thread sends a request to the service and thread hangs while waiting the serice responce.
 
 **One-Way Message Exchange Pattern** is the of comunication "shoot and forget". Client sends a request without waiting response and doesn't have the result of operation or even the information concerning the exceptions that may occur.
@@ -182,82 +182,3 @@ In the case of NetTCPBinding and NetNamedPipeBinding, WCF identifies the client 
 Operation can be marked as an operation that breaks session. For this purpose OperationContract has the "IsTerminating" property. If it set as True it breaks the session.
 
 
-## Service Instantiation
-You can control service instance creation mode using **InstanceContextMode** behavior. The service instance can be one per all requests "Single", in that case the requests will be placed in queue and processed consequently. The instance can be also maiden one per request "PerCall" or one per session "PerSession"
-
-Service instantiation can be managed by OperationContract property **IsInitiating**. The client can't call operations where IsInitiating = False before the operation that has IsInitiating = True has been executed. 
-
-The parameter IsTerminating = True terminates session, so after that the operation with IsInitiating = True can be called only.
-
-
-SessionMode must be "Required"!
-```cs
-        [OperationContract(IsInitiating = True)]
-        bool SignIn()   
-
-        [OperationContract(IsInitiating = false)]
-        List<string> GetData()
-
-        [OperationContract(IsInitiating = false)]
-        void SetData(string data)
-
-        [OperationContract(IsInitiating = false, IsTerminating = True)]
-        bool SignOut()
-```
-
-
-
-## Transactions
-Not all the standart binding support transactions.
-
-Transaction support provided through DTC (Distributed Transaction Manager).
-
-The transaction necesity can be configured by OperationContract.TransactionFlow property, it could be Allowed, NotAllowed, Mandatory.
-
-Definition "[OperationBehavior(TransactionScopeRequired=true)]" makes metod as one transction even if the metod haven't been put in the transaction scope.
-
-
-If the method will be finished without exceptions, the transaction will be commited.
-
-
-This behavior could be changed with parameter TransactionAutoComplete.
-
-
-If the autocompleation switched of 
-([OperationBehavior(TransactionScopeRequired=true, TransactionAutoComplete=false )]), 
-the transaction must be commited automatically by calling "OperationContext.Current.SetTransactionComplete();"
-
-
-
-Transaction can be also controlled from the client side, using transaction scope (using(TransactionScope scope = new TransactionScope())). The "scope" variable in that case musn't be sent as operation parameter, it will be picked up automatically. 
-
-
-[http://www.codeproject.com/Articles/183708/WCF-Transactions-Brief-Introduction](More)
-
-
-## Behaviors
-
-
-
-
-## Streaming
-
-
-
-
-
-
-## Creating REST service in WCF.
-REST service is a service that uses URI and operation name (POST, GET, PUT, DELETE) for getting operation result. It can use any transport protocol, but preferable for this purposes using HTTP becauses it realises CRUD operation on the protocol level and can be acces from any browser.
-
-To make it work, add additional attribute (WebInvoke) to your operation.
-
-
-WebInvoke can be configured using various properties, the more interesting ones:
-
-
-- UriTemplate - that defines URI wich be used to acces operation and parameters, like: "Customer/{id}";
-- Method - defines CRUD operation, like "POST";
-- ResponseFormat - can be defined output format as an XML or JSON. Response format can be chosen automaticly using WebHttpBehavior.AutomaticFormatSelectionEnabled.
-
-REST operations will not appear in WSDL specification.
