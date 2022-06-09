@@ -75,8 +75,7 @@ Supported bindings and its characteristics are shown [here](http://msdn.microsof
 
 ## Binding
 
-Standart bindings support transport protocols: HTTP, TCP, P2P, Named Pipes, MSMQ.
-
+Standart bindings support transport protocols: HTTP, TCP, P2P, Named Pipes, MSMQ.<br>
 Purpose of using of **named pipes** is when communication is required between different WCF applications on a single computer, and you want to prevent any communication from another machine.
 
 Encoding could be binary, text or MTOM.
@@ -207,22 +206,14 @@ Transaction support provided through DTC (Distributed Transaction Manager).
 The transaction necesity can be configured by OperationContract.TransactionFlow property, it could be Allowed, NotAllowed, Mandatory.
 
 Definition "[OperationBehavior(TransactionScopeRequired=true)]" makes metod as one transction even if the metod haven't been put in the transaction scope.
-
-
-If the method will be finished without exceptions, the transaction will be commited.
-
-
-This behavior could be changed with parameter TransactionAutoComplete.
-
-
-If the autocompleation switched of 
+<br>If the method will be finished without exceptions, the transaction will be commited.
+<br>This behavior could be changed with parameter TransactionAutoComplete.
+<br>If the autocompleation switched of 
 ([OperationBehavior(TransactionScopeRequired=true, TransactionAutoComplete=false )]), 
 the transaction must be commited automatically by calling "OperationContext.Current.SetTransactionComplete();"
 
-
-
-Transaction can be also controlled from the client side, using transaction scope (using(TransactionScope scope = new TransactionScope())). The "scope" variable in that case musn't be sent as operation parameter, it will be picked up automatically. 
-
+Transaction can be also controlled from the client side, using transaction scope (using(TransactionScope scope = new TransactionScope())). 
+<br>The "scope" variable in that case musn't be sent as operation parameter, it will be picked up automatically. 
 
 [More](http://www.codeproject.com/Articles/183708/WCF-Transactions-Brief-Introduction)
 
