@@ -1,0 +1,282 @@
+---
+title: Windows Communication Foundation (WCF) reminder
+description: ""
+date: May 31 2014
+---
+
+under construction
+
+##What a WCF is?
+WCF is a framework for building service-oriented applications.
+
+
+##WCF’s ABС
+In order to access some WCF service you have to define endpoint which contains such key parameters as: Address, Binding and Contract
+
+**Address** can be defined as IP or host name with port and special path. Different kinds of protocols can be used: HTTP, TCP, NamedPipe, Peer2Peer, MSMQ.
+
+- http://host:8080
+
+- net.tcp://host:987/service
+
+- net.pipe//pipe/service
+
+
+**Binding** specifies service access mode.
+
+- Protocols determines the security, reliability, and context flow settings to use for messages that are sent to the endpoint;
+- Encoding determines the wire encoding to use for messages that are sent to the endpoint, for example, text/XML, binary, or Message Transmission Optimization Mechanism (MTOM);
+- Transport determines the underlying transport protocol to use when sending messages to the endpoint: HTTP, TCP, NamedPipe, Peer2Peer, MSMQ.
+
+
+Supported bindings and its characteristics are shown [http://msdn.microsoft.com/en-us/library/ms730879(v=vs.110).aspx](here)
+
+
+**Contract** is a way to describe what service does.
+- Srvice contract describes an operations that service can perform.
+- Data Contract defines which data types are passed to and from the service.
+- Fault contracts defines errors raised by the service.
+- Message contracts contains Data like a DatContract, however, it allows to control the structure of SOAP message, e.g. what data should be in header and what in body, or element names. It also makes some restrictions on operation syntax.  [http://msdn.microsoft.com/en-us/library/ms730255(v=vs.110).aspx](MessageContract)
+- Collection data contract allows to control xml representation of collections precisely.
+
+```cs
+        [ServiceContract]
+        public interface ISomeService
+        {
+            [OperationContract]
+            SomeData SomeOperation(int arg1, string arg2, SomeData arg3);
+
+            [OperationContract]
+            SomeMessage SomeOperation(SomeMessage);
+        }
+
+        [DataContract]
+        public class SomeData
+        {
+            [DataMember]
+            public int SomeId { get; set; }
+            [DataMember]
+            public List<string> SomeData { get; set; }
+        }
+
+        [MessageContract]
+        public class SomeMessage
+        {
+           [MessageHeader(ProtectionLevel=None)] public int arg1;
+           [MessageHeader(ProtectionLevel=Sign)] public int arg2;
+           [MessageBodyMember(ProtectionLevel=EncryptAndSign)] public string SomeData;
+        }
+
+        [CollectionDataContract(
+            Name = "CountriesOrRegionsWithCapitals", 
+            ItemName = "entry", 
+            KeyName = "countryorregion", 
+            ValueName = "capital")]
+        public class CountriesOrRegionsWithCapitals2 : Dictionary<string, string> { }
+
+```
+
+
+
+##Binding
+
+Standart bindings support transport protocols: HTTP, TCP, P2P, Named Pipes, MSMQ.
+
+Purpose of using of **named pipes** is when communication is required between different WCF applications on a single computer, and you want to prevent any communication from another machine.
+
+
+
+Encoding could be binary, text or MTOM.
+
+
+
+Security could be on transport or message level or without any.
+
+
+Some binding support sessions and some of them are not.
+
+Some binding support transactions and some of them are not.
+
+
+The diagram that helps choosing corect binding
+img src="../images/choose_binding.jpg"
+
+
+
+##Fault contract
+
+Fault contract allows making standartized fault messages.
+```cs
+        [ServiceContract]
+        public interface ISomeService
+        {
+            [OperationContract]
+            [FaultContract(typeof(MathFault))]
+            SomeData SomeOperation(int arg1, string arg2, SomeData arg3);
+        }
+
+        [DataContract]
+        public class SomeFault
+        {
+            [DataMember]
+            public string Cause { get; set; }
+            [DataMember]
+            public string Resolution { get; set; }
+        }
+```
+
+
+Now the SomeOperation body can throw exception this way:
+
+
+throw new FaultException<SomeFault>(
+
+&nbsp;&nbsp;&nbsp;&nbsp;new SomeFault { Cause = "Becuse exception ocured", Resolution = "Write better code)."} );
+
+
+And the fault can be handled on the client side using:
+
+
+catch (FaultException&lt;SomeFault&gt; e).
+
+
+
+##Message Patterns in WCF
+**Request-Reply Pattern** is a syncronous way of comunication. The client thread sends a request to the service and thread hangs while waiting the serice responce.
+
+**One-Way Message Exchange Pattern** is the of comunication "shoot and forget". Client sends a request without waiting response and doesn't have the result of operation or even the information concerning the exceptions that may occur.
+
+**Duplex or Callback Message Exchange Pattern** is an asyncronous way of comunication. Client sends a request without waiting response but having the result of operation as callback from the server side. IOW it is a Request-Reply Pattern without hanging the client thread.
+
+
+One-Way pattern can be easily implemented by setting IsOneWay property in your operation contract.
+```cs
+[OperationContract(IsOneWay = true)]
+void LogAction(string action);
+```
+
+
+Duplex pattern is a bit harder. You have to have two interfaces, the service interface and the callback interface. Both operations have to marked as OneWay and a service must know the callback contract interface.
+```cs
+
+        [ServiceContract(CallbackContract=typeof(ILoggingServiceCallback))]
+        public interface ILoggingService
+        {
+            [OperationContract(IsOneWay = true)]
+            void LogAction(string action);
+        }
+
+        public interface ILoggingServiceCallback
+        {
+            [OperationContract(IsOneWay = true)]
+            void LoggingSuccessful(bool someResult);
+        }
+```
+
+
+
+Looks fine, but who will call LoggingSuccessful? From the service operation body (implementation of LogAction method) will be called the LoggingSuccessfull method manually (OperationContext.Current.GetCallbackChannel<ILoggingServiceCallback>().LoggingSuccessful(true);).
+
+
+On the client side you have to implement ILoggingServiceCallback in order to have an ability to execute some logic when service calls back.
+
+
+
+##Sessions
+WCF service session used only to identify the client, an can't store some additional data because service must be stateless by definition.
+
+ - Not all the bindings support sessions, so the one that supports has to chosen.
+
+ - The **InstanceContextMode** behavior must be set as "PerSession".
+
+ - The service contract's property **SessionMode** has to be "Allowed" or "Required". If it equals "NotAllowed" the connections that require session will be ignored. In the case of "Required" the session-less connections will be ignored.
+
+In the case of NetTCPBinding and NetNamedPipeBinding, WCF identifies the client by the underlying transport channel. However, the WSHttp uses connection-less http protocol, so in order to identify the client session it adds session id into header.
+
+Operation can be marked as an operation that breaks session. For this purpose OperationContract has the "IsTerminating" property. If it set as True it breaks the session.
+
+
+##Service Instantiation
+You can control service instance creation mode using **InstanceContextMode** behavior. The service instance can be one per all requests "Single", in that case the requests will be placed in queue and processed consequently. The instance can be also maiden one per request "PerCall" or one per session "PerSession"
+
+Service instantiation can be managed by OperationContract property **IsInitiating**. The client can't call operations where IsInitiating = False before the operation that has IsInitiating = True has been executed. 
+
+The parameter IsTerminating = True terminates session, so after that the operation with IsInitiating = True can be called only.
+
+
+SessionMode must be "Required"!
+```cs
+        [OperationContract(IsInitiating = True)]
+        bool SignIn()   
+
+        [OperationContract(IsInitiating = false)]
+        List<string> GetData()
+
+        [OperationContract(IsInitiating = false)]
+        void SetData(string data)
+
+        [OperationContract(IsInitiating = false, IsTerminating = True)]
+        bool SignOut()
+```
+
+
+
+##Transactions
+Not all the standart binding support transactions.
+
+Transaction support provided through DTC (Distributed Transaction Manager).
+
+The transaction necesity can be configured by OperationContract.TransactionFlow property, it could be Allowed, NotAllowed, Mandatory.
+
+Definition "[OperationBehavior(TransactionScopeRequired=true)]" makes metod as one transction even if the metod haven't been put in the transaction scope.
+
+
+If the method will be finished without exceptions, the transaction will be commited.
+
+
+This behavior could be changed with parameter TransactionAutoComplete.
+
+
+If the autocompleation switched of 
+([OperationBehavior(TransactionScopeRequired=true, TransactionAutoComplete=false )]), 
+the transaction must be commited automatically by calling "OperationContext.Current.SetTransactionComplete();"
+
+
+
+Transaction can be also controlled from the client side, using transaction scope (using(TransactionScope scope = new TransactionScope())). The "scope" variable in that case musn't be sent as operation parameter, it will be picked up automatically. 
+
+
+[http://www.codeproject.com/Articles/183708/WCF-Transactions-Brief-Introduction](More)
+
+
+##Behaviors
+
+
+
+
+##Streaming
+
+
+
+
+
+
+##Creating REST service in WCF.
+REST service is a service that uses URI and operation name (POST, GET, PUT, DELETE) for getting operation result. It can use any transport protocol, but preferable for this purposes using HTTP becauses it realises CRUD operation on the protocol level and can be acces from any browser.
+
+To make it work, add additional attribute (WebInvoke) to your operation.
+
+
+WebInvoke can be configured using various properties, the more interesting ones:
+
+
+- UriTemplate - that defines URI wich be used to acces operation and parameters, like: "Customer/{id}";
+
+
+- Method - defines CRUD operation, like "POST";
+
+
+- ResponseFormat - can be defined output format as an XML or JSON. Response format can be chosen automaticly using WebHttpBehavior.AutomaticFormatSelectionEnabled.
+
+
+REST operations will not appear in WSDL specification.
