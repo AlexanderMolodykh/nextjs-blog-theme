@@ -1,0 +1,317 @@
+---
+title: Templated custom controls in XAML (Windows 8)
+description: "Making templated XAML control under Windows 8 METRO. Difference between WPF and Windows 8."
+date: May 16 2012
+---
+Example for [.NET UserGroup](http://donetsk-usergroup.blogspot.com/2012/04/net-user-group.html) meeting.
+
+Making templated XAML control under Windows 8 METRO are the same as for WPF or Silverlight. So the theory you can read from my  [previouse article](/posts/animation-in-xaml/).
+Of course there are some differences present. Differences that I found described in current article.
+
+I'll move control described in the  [previouse article](/posts/animation-in-xaml/) from WPF/Silverlight to Windows 8 METRO application.
+
+
+First stage the same:
+
+```cs
+        public sealed class PacmanControl : Control
+        {
+            public static readonly DependencyProperty SizeProperty =
+                DependencyProperty.Register("Size", typeof (double), 
+                    typeof (PacmanControl), new PropertyMetadata(default(double)));
+
+            public double Size
+            {
+                get { return (double) GetValue(SizeProperty); }
+                set { SetValue(SizeProperty, value); }
+            }
+
+            public static readonly DependencyProperty MouthAngleProperty =
+                DependencyProperty.Register("MouthAngle", typeof (double), 
+                    typeof (PacmanControl), new PropertyMetadata(default(double)));
+
+            public double MouthAngle
+            {
+                get { return (double) GetValue(MouthAngleProperty); }
+                set { SetValue(MouthAngleProperty, value); }
+            }
+
+            public PacmanControl()
+            {
+                DefaultStyleKey = typeof(PacmanControl);
+            }
+        }
+```
+
+Second stage the same too:
+
+```xml
+        <Style TargetType="Pacman:PacmanControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid>
+                            <!--  upper chew  -->
+                            <Path
+                                    x:Name="TopChew"
+                                    VerticalAlignment="Top"
+                                    Data="M0,0 A0.5,0.5,0,1,1,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                            </Path>
+                            <!--  down chew  -->
+                            <Path
+                                    x:Name="BotChew"
+                                    VerticalAlignment="Bottom"
+                                    Data="M0,0 A0.5,0.5,0,1,0,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                            </Path>
+                            <!--  Eye  -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.45*" />
+                                    <ColumnDefinition Width="0.1*" />
+                                    <ColumnDefinition Width="0.45*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.25*" />
+                                    <RowDefinition Height="0.1*" />
+                                    <RowDefinition Height="0.65*" />
+                                </Grid.RowDefinitions>
+                                <Ellipse
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Fill="Black" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+```
+
+Template bindings are working too:
+
+```xml
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid                                
+                            Width="{TemplateBinding Size}"
+                            Height="{TemplateBinding Size}">
+                               ...
+```
+
+Some transformations in Windows 8 was changed (LayoutTransform changed to RenderTransform). But Rotate transform still present:
+
+```xml
+                                <Path.RenderTransform>
+                                    <RotateTransform />
+                                </Path.RenderTransform>
+```
+
+But in Windows 8 we can't change RotateTransform using direct access to the class. IOW: when you get topRotator instance using GetTemplateChild and change its properties it doesn't make any effect on figure. We have to access parent container
+
+
+Next step should look like it:
+
+```cs
+    [TemplatePart(Name = TopChew, Type = typeof(Path))]
+    [TemplatePart(Name = BotChew, Type = typeof(Path))]
+    public class PacmanControl : Control
+    {
+        private const string BotChew = "BotChew";
+        private const string TopChew = "TopChew";
+
+        private Path _botChew;
+        private Path _topChew;
+
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _topChew = GetTemplateChild(TopChew) as Path;
+            _botChew = GetTemplateChild(BotChew) as Path;
+        }
+    }
+```
+
+With property changed:
+
+```cs
+    [TemplatePart(Name = TopChew, Type = typeof(Path))]
+    [TemplatePart(Name = BotChew, Type = typeof(Path))]
+    public class PacmanControl : Control
+    {
+        private const string BotChew = "BotChew";
+        private const string TopChew = "TopChew";
+
+        public static readonly DependencyProperty MouseAngleProperty =
+            DependencyProperty.Register("MouthAngle", typeof(double), typeof(PacmanControl),
+                new PropertyMetadata(default(double),
+                    (o, args) => ((PacmanControl)o).PropertyChangedCallback()));
+
+        public static readonly DependencyProperty SizeProperty =
+            DependencyProperty.Register("Size", typeof(double), typeof(PacmanControl),
+                new PropertyMetadata(default(double),
+                    (o, args) => ((PacmanControl)o).PropertyChangedCallback()));
+
+        private Path _botChew;
+        private Path _topChew;
+
+        public double MouthAngle
+        {
+            get { return (double)GetValue(MouseAngleProperty); }
+            set { SetValue(MouseAngleProperty, value); }
+        }
+
+        public double Size
+        {
+            get { return (double)GetValue(SizeProperty); }
+            set { SetValue(SizeProperty, value); }
+        }
+
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _topChew = GetTemplateChild(TopChew) as Path;
+            _botChew = GetTemplateChild(BotChew) as Path;
+            PropertyChangedCallback();
+        }
+
+        private void PropertyChangedCallback()
+        {
+            RotateTransform topRotator = null;
+            RotateTransform botRotator = null;
+            if (_topChew != null)
+                topRotator = _topChew.RenderTransform as RotateTransform;
+            if (_botChew != null)
+                botRotator = _botChew.RenderTransform as RotateTransform;
+
+            if (topRotator != null)
+            {
+                topRotator.CenterX = Size / 2;
+                topRotator.CenterY = Size / 2;
+                topRotator.Angle = -MouthAngle;
+            }
+            if (botRotator != null)
+            {
+                botRotator.CenterX = Size / 2;
+                botRotator.Angle = MouthAngle;
+            }
+        }
+    }
+```
+
+Changing visual states still the same:
+
+```cs
+        public PacmanControl()
+        {
+            DefaultStyleKey = typeof(PacmanControl);
+            Loaded += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+            PointerEntered += (sender, args) => VisualStateManager.GoToState(this, "MouseOver", true);
+            PointerExited += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+            PointerPressed += (sender, args) => VisualStateManager.GoToState(this, "Pressed", true);
+            PointerReleased += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+        }
+```
+
+```cs
+    [TemplateVisualState(Name = "Normal")]
+    [TemplateVisualState(Name = "MouseOver")]
+    [TemplateVisualState(Name = "Pressed")]
+```
+
+We cant access to topRotator from animation too. You have to access parent container "BotChew" with "(Path.RenderTransform).(RotateTransform.Angle)".
+
+```xml
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid Width="{TemplateBinding Size}" Height="{TemplateBinding Size}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
+                                            <DoubleAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.Fill).(SolidColorBrush.Color)" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.Fill).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                AutoReverse="True"
+                                                Duration="0:0:0.2"
+                                                From="40"
+                                                RepeatBehavior="Forever"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <DoubleAnimation
+                                                AutoReverse="True"
+                                                Duration="0:0:0.2"
+                                                From="-40"
+                                                RepeatBehavior="Forever"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <DoubleAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+                                                To="Red" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+                                                To="Red" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                         ...
+```
+
+Source code you can find here [Pacman control for windows 8](https://Prof-MAG@github.com/Prof-MAG/pacman_windows_8.git)
+
