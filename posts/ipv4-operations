@@ -1,0 +1,102 @@
+---
+title: Helper for IPv4 operations
+description: "This class implements some operations with IP adress. For example '192.168.0.255' + 1 = '192.168.1.0'."
+date: Jul 5 2010
+---
+
+P.S.: Standart IPAddress class has "Adress" property for getting IP as "long" that is marked as deprecated so I relize it by my self.
+
+```cs
+        static class IPOperations
+        {
+            /// <summary>
+            /// Convert IP address to unsigned int value
+            /// </summary>
+            public static UInt32 ToUInt(System.Net.IPAddress ip)
+            {
+                return ToUInt(ip.GetAddressBytes());
+            }
+
+            /// <summary>
+            /// Convert IP address to unsigned int value
+            /// </summary>
+            public static UInt32 ToUInt(byte[] bip)
+            {
+                if (bip == null) throw new ArgumentNullException();
+                if (bip.Length < 4) 
+                    throw new FormatException(
+                        "IPOperations: parameter byte[] ip must have 4 or more elements.");
+                return (uint)(bip[3] | (bip[2] << 8) | (bip[1] << 16) | (bip[0] << 24));
+            }
+
+            /// <summary>
+            /// Convert IP address to unsigned int value
+            /// </summary>
+            /// <exception cref="System.ArgumentNullException"></exception>
+            /// <exception cref="System.FormatException"></exception>
+            public static UInt32 ToUInt(string ip)
+            {
+                return ToUInt(System.Net.IPAddress.Parse(ip));
+            }
+
+            /// <summary>
+            /// Convert IP to string
+            /// </summary>
+            public static string ToString(long ip)
+            {
+                return ToString(ToByte((uint)ip));
+            }
+
+            /// <summary>
+            /// Convert IP to string
+            /// </summary>
+            public static string ToString(byte[] ip)
+            {
+                if (ip == null) throw new ArgumentNullException();
+                if (ip.Length < 4) 
+                    throw new FormatException(
+                        "IPOperations: parameter byte[] ip must have 4 or more elements.");
+                return ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3];
+            }
+
+            /// <summary>
+            /// Convert IP to byte array
+            /// </summary>
+            public static byte[] ToByte(UInt32 ip)
+            {
+                byte[] res = new byte[4];
+                res[3] = (byte)ip;
+                ip = ip >> 8;
+                res[2] = (byte)ip;
+                ip = ip >> 8;
+                res[1] = (byte)ip;
+                ip = ip >> 8;
+                res[0] = (byte)ip;
+                return res;
+            }
+
+            /// <summary>
+            /// Increment ip address
+            /// </summary>
+            /// <param name="ip">ip
+            public static System.Net.IPAddress Inc(System.Net.IPAddress ip)
+            {
+                return new System.Net.IPAddress(ToUInt(ip) + 1);
+            }
+            public static System.Net.IPAddress Inc(long ip)
+            {
+                return new System.Net.IPAddress(ip + 1);
+            }
+
+            /// <summary>
+            /// subtraction ip's
+            /// </summary>
+            /// <param name="ip1">minuend
+            /// <param name="ip2">subtrahend
+            /// <returns> = ip1 - ip2</returns>
+            public static long Sub(System.Net.IPAddress ip1, System.Net.IPAddress ip2)
+            {
+                return ToUInt(ip1) - ToUInt(ip2);
+            }
+        }
+```
