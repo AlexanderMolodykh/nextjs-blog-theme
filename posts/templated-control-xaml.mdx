@@ -5,7 +5,7 @@ date: May 3 2012
 ---
 
 I show templated custom control creation using packman as example.
-
+```
 <object id="SilverlightPlugin1" width="800" height="200"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
@@ -17,7 +17,7 @@ I show templated custom control creation using packman as example.
             alt="Get Microsoft Silverlight" 
             style="border-style: none"/>
     </a>
-</object>
+</object>```
 **Firstable we have to define control properties.** Packman has parameters: size and mouth angle. So we have to create two properties: Size and MouthAngle. In the future we propably want to bind to this properties so it's better if we make this properties as dependecy properties.
 
 Dependency Property can be registred only in the class inherited from DependencyObject. DependencyObject contains control's properties dictionary, this dictionary uses DependencyProperty as key and propery value as value. Using methods GetValue and SetValue we can access to this dictionary. Should notice that when you register Dependency Property, current value at the dictionary doesn't initializes, so we can have a lot of propertyes in the control but it still have small size in the memory.
@@ -134,7 +134,7 @@ Pacman's face consists of two semicirles and eye:
 Now we have pacman sceleton, but properties Size and MouthAngle doesn't do anything.
 
 
-<object id="SilverlightPlugin1" width="800" height="200"
+```<object id="SilverlightPlugin1" width="800" height="200"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
     <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight1.xap"/>
@@ -145,7 +145,7 @@ Now we have pacman sceleton, but properties Size and MouthAngle doesn't do anyth
             alt="Get Microsoft Silverlight" 
             style="border-style: none"/>
     </a>
-</object>
+</object>```
 
 **After that we have to bound control properties in the template.**
 
@@ -163,7 +163,7 @@ We can solve this issue using bindings, actually TemplateBinding extension. Temp
 
 If you run current example you'll see pacman. And can resize it using Size property. 
 
-<object id="SilverlightPlugin1" width="800" height="200"
+```<object id="SilverlightPlugin1" width="800" height="200"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
     <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight2.xap"/>
@@ -174,7 +174,7 @@ If you run current example you'll see pacman. And can resize it using Size prope
             alt="Get Microsoft Silverlight" 
             style="border-style: none"/>
     </a>
-</object>
+</object>```
 
 **Dificalties in the control's properties bounding.**
 Next thing we may want to do is to add mouth angle changing. In the other words we want to rotate semicircles. We can make it with transformations (RenderTransform and class RotateTransform). Let's add RotateTrnsform classes TopRotator and BotRotator to semicircles:
@@ -332,7 +332,7 @@ Note: Attribute TemplatePart needs for showing designer/programmer/tool(Blend) t
 <i>**Congratulations:** At this moment we have fully working pacman. And we can change it's size and mouth angle dynamicly.</i>
 
 
-<object id="SilverlightPlugin1" width="800" height="200"
+```<object id="SilverlightPlugin1" width="800" height="200"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
     <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight3.xap"/>
@@ -343,7 +343,7 @@ Note: Attribute TemplatePart needs for showing designer/programmer/tool(Blend) t
             alt="Get Microsoft Silverlight" 
             style="border-style: none"/>
     </a>
-</object>
+</object>```
 
 **Reaction on user action**
 
@@ -455,7 +455,7 @@ And add requirements for template:
                          ...
 ```
 
-<object id="SilverlightPlugin1" width="800" height="200"
+```<object id="SilverlightPlugin1" width="800" height="200"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
     <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
@@ -466,7 +466,7 @@ And add requirements for template:
             alt="Get Microsoft Silverlight" 
             style="border-style: none"/>
     </a>
-</object>
+</object>```
 
 Current state can be assigned only one per group. When visual state is changing, current animation (from previous visual state) stops and new animation starts. If you doesn't define From values in your animations  animation will start from current point and it looks like continuation.
 
