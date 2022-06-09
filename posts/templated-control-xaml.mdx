@@ -1,0 +1,476 @@
+---
+title: Templated custom controls in XAML (WPF, Silverlight)
+description: "If you need a custom control you can make it in an easyest way using other controls you have and make connection between them in code behind. But here are probably few disadvantages like hard connection between logic and view and imposibility for customization control's view in the future. That's why if you want to use you control more than once it is better to make templated control."
+date: May 3 2012
+---
+
+I show templated custom control creation using packman as example.
+
+<object id="SilverlightPlugin1" width="800" height="200"
+    data="data:application/x-silverlight-2," 
+    type="application/x-silverlight-2" >
+    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
+    <!-- Display installation image. -->
+    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
+        style="text-decoration: none;">
+        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
+            alt="Get Microsoft Silverlight" 
+            style="border-style: none"/>
+    </a>
+</object>
+**Firstable we have to define control properties.** Packman has parameters: size and mouth angle. So we have to create two properties: Size and MouthAngle. In the future we propably want to bind to this properties so it's better if we make this properties as dependecy properties.
+
+Dependency Property can be registred only in the class inherited from DependencyObject. DependencyObject contains control's properties dictionary, this dictionary uses DependencyProperty as key and propery value as value. Using methods GetValue and SetValue we can access to this dictionary. Should notice that when you register Dependency Property, current value at the dictionary doesn't initializes, so we can have a lot of propertyes in the control but it still have small size in the memory.
+
+DefaultStyleKey defines style type that must be aplied as default
+
+```cs
+        public sealed class PacmanControl : Control
+        {
+            public static readonly DependencyProperty SizeProperty =
+                DependencyProperty.Register("Size", typeof (double), 
+                    typeof (PacmanControl), new PropertyMetadata(default(double)));
+
+            public double Size
+            {
+                get { return (double) GetValue(SizeProperty); }
+                set { SetValue(SizeProperty, value); }
+            }
+
+            public static readonly DependencyProperty MouthAngleProperty =
+                DependencyProperty.Register("MouthAngle", typeof (double), 
+                    typeof (PacmanControl), new PropertyMetadata(default(double)));
+
+            public double MouthAngle
+            {
+                get { return (double) GetValue(MouthAngleProperty); }
+                set { SetValue(MouthAngleProperty, value); }
+            }
+
+            public PacmanControl()
+            {
+                DefaultStyleKey = typeof(PacmanControl);
+            }
+        }
+```
+
+Note: Make all properties in your custom control as dependency properties. In 99% you might want to bin them in the future. 
+Binding wouldn't work if your control doesn't inherit from the FrameworkElement class. Control class inherits from FrameworkElement that's why bindings must work.
+
+Note: if you won't define DefaultStyleKey it will be equaled to typeof(Control) (This assignment appears in the Control class constructor.) And default style will be style with type Control insted of PacmanControl.
+
+
+Now we have PacmanControl that we can use in the XAML. Only thing is it won't show anything.
+
+```xml
+        <Pacman:PacmanControl
+            x:Name="pacman"
+            MouthAngle="40"
+            Size="100" />
+```
+
+**Next we have to create template for this control.** Template it's view of control. For template attaching we have to define "Template" property. It can be done with styles.
+
+As you might know higher priority in the defining Template property directly, next - from style.
+
+You must be curious about how standart controls are having good look even if you not define template in your application? That's because XAML engine looks at the assembly where control was defined and searching resource with name "Generic.xaml". When it founds the XAML engine applyes styles from it.
+
+
+Pacman's face consists of two semicirles and eye:
+```xml
+        <Style TargetType="Pacman:PacmanControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid>
+                            <!--  upper chew  -->
+                            <Path
+                                    x:Name="TopChew"
+                                    VerticalAlignment="Top"
+                                    Data="M0,0 A0.5,0.5,0,1,1,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                            </Path>
+                            <!--  down chew  -->
+                            <Path
+                                    x:Name="BotChew"
+                                    VerticalAlignment="Bottom"
+                                    Data="M0,0 A0.5,0.5,0,1,0,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                            </Path>
+                            <!--  Eye  -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.45*" />
+                                    <ColumnDefinition Width="0.1*" />
+                                    <ColumnDefinition Width="0.45*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.25*" />
+                                    <RowDefinition Height="0.1*" />
+                                    <RowDefinition Height="0.65*" />
+                                </Grid.RowDefinitions>
+                                <Ellipse
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Fill="Black" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+```
+
+Now we have pacman sceleton, but properties Size and MouthAngle doesn't do anything.
+
+
+<object id="SilverlightPlugin1" width="800" height="200"
+    data="data:application/x-silverlight-2," 
+    type="application/x-silverlight-2" >
+    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight1.xap"/>
+    <!-- Display installation image. -->
+    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
+        style="text-decoration: none;">
+        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
+            alt="Get Microsoft Silverlight" 
+            style="border-style: none"/>
+    </a>
+</object>
+
+**After that we have to bound control properties in the template.**
+
+With properties With and Height of the parent Grid we can limit pacman's size. Only thin we need is to make: Grid.Width=PacmanControl.Size and Grid.Height=PacmanControl.Size.
+
+We can solve this issue using bindings, actually TemplateBinding extension. TemplateBinding is the only way to bind to control properties from the template.
+
+```xml
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid                                
+                            Width="{TemplateBinding Size}"
+                            Height="{TemplateBinding Size}">
+                               ...
+```
+
+If you run current example you'll see pacman. And can resize it using Size property. 
+
+<object id="SilverlightPlugin1" width="800" height="200"
+    data="data:application/x-silverlight-2," 
+    type="application/x-silverlight-2" >
+    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight2.xap"/>
+    <!-- Display installation image. -->
+    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
+        style="text-decoration: none;">
+        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
+            alt="Get Microsoft Silverlight" 
+            style="border-style: none"/>
+    </a>
+</object>
+
+**Dificalties in the control's properties bounding.**
+Next thing we may want to do is to add mouth angle changing. In the other words we want to rotate semicircles. We can make it with transformations (RenderTransform and class RotateTransform). Let's add RotateTrnsform classes TopRotator and BotRotator to semicircles:
+
+
+```xml
+        <Style TargetType="Pacman:PacmanControl">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid                                
+                            Width="{TemplateBinding Size}"
+                            Height="{TemplateBinding Size}">
+                            <!--  upper chew  -->
+                            <Path
+                                    x:Name="TopChew"
+                                    VerticalAlignment="Top"
+                                    Data="M0,0 A0.5,0.5,0,1,1,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                                <Path.RenderTransform>
+                                    <RotateTransform x:Name="TopRotator" />
+                                </Path.RenderTransform>
+                            </Path>
+                            <!--  down chew  -->
+                            <Path
+                                    x:Name="BotChew"
+                                    VerticalAlignment="Bottom"
+                                    Data="M0,0 A0.5,0.5,0,1,0,1,0 L0.5,0"
+                                    Fill="Yellow"
+                                    Stretch="Uniform"
+                                    Stroke="Gray"
+                                    StrokeEndLineCap="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeThickness="1">
+                                <Path.RenderTransform>
+                                    <RotateTransform x:Name="BotRotator" />
+                                </Path.RenderTransform>
+                            </Path>
+                            <!--  Eye  -->
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.45*" />
+                                    <ColumnDefinition Width="0.1*" />
+                                    <ColumnDefinition Width="0.45*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="0.25*" />
+                                    <RowDefinition Height="0.1*" />
+                                    <RowDefinition Height="0.65*" />
+                                </Grid.RowDefinitions>
+                                <Ellipse
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Fill="Black" />
+                            </Grid>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+```
+
+You may think to bind RotateTransform.Angle property to MouthAngle, but it won't work. RotateTransform doesn't inherits from FrameworkElement class so bindings won't work. 
+
+For this reason we'll make this assignments in the control class. Ofcourse it's some kind of connection between control logic and view but we'll make it tiny, and it still be the templated control because we can redefine template. There is only one disadvantage, in the new template we will have to have RotateTransform classes TopRotator and BotRotator.
+
+
+When new template is attaching virtual metod OnApplyTemplate() is executing. At this moment you can look for TopRotator and BotRotator classes and save it in the memory:
+
+```cs
+        private const string TopRotator = "TopRotator";
+        private const string BotRotator = "BotRotator";
+
+        private RotateTransform _topRotator;
+        private RotateTransform _botRotator;
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _topRotator = GetTemplateChild(TopRotator) as RotateTransform;
+            _botRotator = GetTemplateChild(BotRotator) as RotateTransform;
+        }
+```
+
+After that we can define rotation properties from PacmanControl. 
+
+```cs
+        [TemplatePart(Name = TopRotator, Type = typeof(RotateTransform))]
+        [TemplatePart(Name = BotRotator, Type = typeof(RotateTransform))]
+        public class PacmanControl : Control
+        {
+            private const string TopRotator = "TopRotator";
+            private const string BotRotator = "BotRotator";
+
+            public static readonly DependencyProperty SizeProperty =
+                DependencyProperty.Register("Size", typeof (double), typeof (PacmanControl),
+                     new PropertyMetadata(default(double),
+                          (o, args) => ((PacmanControl) o).PropertyChangedCallback()));
+
+            public static readonly DependencyProperty MouthAngleProperty =
+                DependencyProperty.Register("MouthAngle", typeof (double), typeof (PacmanControl),
+                     new PropertyMetadata(default(double),
+                          (o, args) => ((PacmanControl) o).PropertyChangedCallback()));
+
+            public double MouthAngle
+            {
+                get { return (double) GetValue(MouthAngleProperty); }
+                set { SetValue(MouthAngleProperty, value); }
+            }
+
+            private RotateTransform _topRotator;
+            private RotateTransform _botRotator;
+
+            public double Size
+            {
+                get { return (double) GetValue(SizeProperty); }
+                set { SetValue(SizeProperty, value); }
+            }
+        
+            public override void OnApplyTemplate()
+            {
+                base.OnApplyTemplate();
+                _topRotator = GetTemplateChild(TopRotator) as RotateTransform;
+                _botRotator = GetTemplateChild(BotRotator) as RotateTransform;
+                PropertyChangedCallback();
+            }
+
+            private void PropertyChangedCallback()
+            {
+                if (_topRotator != null)
+                {
+                    _topRotator.CenterX = Size/2;
+                    _topRotator.CenterY = Size/2;
+                    _topRotator.Angle = -MouthAngle;
+                }
+                if (_botRotator != null)
+                {
+                    _botRotator.CenterX = Size/2;
+                    _botRotator.Angle = MouthAngle;
+                }
+            }
+        }
+```
+
+Note: You have to make properties assignment on reqire properties changing and in OnApplyTemplate() method execution.
+
+Note: Attribute TemplatePart needs for showing designer/programmer/tool(Blend) that this control is expecting such classes with such names in the template. This attributes doesn't imply on the control behaviour.
+
+
+<i>**Congratulations:** At this moment we have fully working pacman. And we can change it's size and mouth angle dynamicly.</i>
+
+
+<object id="SilverlightPlugin1" width="800" height="200"
+    data="data:application/x-silverlight-2," 
+    type="application/x-silverlight-2" >
+    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight3.xap"/>
+    <!-- Display installation image. -->
+    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
+        style="text-decoration: none;">
+        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
+            alt="Get Microsoft Silverlight" 
+            style="border-style: none"/>
+    </a>
+</object>
+
+**Reaction on user action**
+
+There is only one thing we haven't done, it's some reaction on hovering and mouse pressing.
+
+We can provide it with visual states.
+
+
+**VisualStates** are containing in the VisualStateGroup class that connects to controls with "VisualStateManager.VisualStateGroups" attached property. VisualStateGroup property is some kind of dictionary where key is a string and value is an animation. Using this key you can access associated animation and start it, method VisualStateManager.GoToState is doing it. If dictionary doesn't contain requested key it won't throw any exception. Let's assign "Normal", "MouseOver", "Pressed" visual states according to some user actions:
+
+Add following to constructor:
+
+```cs
+            Loaded += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+            MouseEnter += (sender, args) => VisualStateManager.GoToState(this, "MouseOver", true);
+            MouseLeave += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+            MouseLeftButtonDown += (sender, args) => VisualStateManager.GoToState(this, "Pressed", true);
+            MouseLeftButtonUp += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+```
+And add requirements for template:
+
+```cs
+    [TemplateVisualState(Name = "Normal")]
+    [TemplateVisualState(Name = "MouseOver")]
+    [TemplateVisualState(Name = "Pressed")]
+```
+
+**After that we can associate visual states with the animations.** About animation and storyboard you can read in my previous post: [Animation in Silverlight 5](/posts/animation-in-xaml/)
+
+```xml
+                    <ControlTemplate TargetType="Pacman:PacmanControl">
+                        <Grid Width="{TemplateBinding Size}" Height="{TemplateBinding Size}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
+                                            <DoubleAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.Fill).(SolidColorBrush.Color)" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.2"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.Fill).(SolidColorBrush.Color)" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="MouseOver">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                AutoReverse="True"
+                                                Duration="0:0:0.2"
+                                                From="40"
+                                                RepeatBehavior="Forever"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <DoubleAnimation
+                                                AutoReverse="True"
+                                                Duration="0:0:0.2"
+                                                From="-40"
+                                                RepeatBehavior="Forever"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <DoubleAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty=
+                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
+                                                To="0" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="BotChew"
+                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+                                                To="Red" />
+                                            <ColorAnimation
+                                                Duration="0:0:0.5"
+                                                Storyboard.TargetName="TopChew"
+                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+                                                To="Red" />
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                         ...
+```
+
+<object id="SilverlightPlugin1" width="800" height="200"
+    data="data:application/x-silverlight-2," 
+    type="application/x-silverlight-2" >
+    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
+    <!-- Display installation image. -->
+    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
+        style="text-decoration: none;">
+        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
+            alt="Get Microsoft Silverlight" 
+            style="border-style: none"/>
+    </a>
+</object>
+
+Current state can be assigned only one per group. When visual state is changing, current animation (from previous visual state) stops and new animation starts. If you doesn't define From values in your animations  animation will start from current point and it looks like continuation.
+
+Note: Animation mustn't crossing. IOW one property can't be animated more than ones in the moment, if it be it'll thow exception.
+
+
+Source code you can find here [pacman_silverlight](https://Prof-MAG@github.com/Prof-MAG/pacman_silverlight.git)
