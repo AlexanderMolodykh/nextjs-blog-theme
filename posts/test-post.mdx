@@ -1,7 +1,137 @@
 ---
-title: Design critiques at Figma
-description: "Consider that for a moment: everything we see around us is assumed to have had a cause and is contingent upon."
-date: Jan 2 2021
+title: Inheritance principles in practice
+description: "This code demonstate's some important principles in inheritance that "young" developers often forget."
+date: Jun 1 2010
 ---
 
-This is an example post. There's another one [here](/posts/example-post).
+This code demonstate's some important principles in inheritance that "young" developers often forget.
+
+» Use the override modifier when the base entity is marked as abstract, virtual or override.
+
+» An interface contains only the signatures of methods, properties, events or indexers. All members are public by default.
+
+» When you inherit some class, the base constructor will be called in automatic mode if its without parameters, otherwise it shows you an error because compiler don't know what parameters sould be placed to the base class constructor.
+
+» When you cover some method, field or property it can be accessed throught the base class.
+
+```js
+        using System;
+
+        namespace ConsoleApplication1
+        {
+             interface IClass
+             {
+                  // can&#39;t have fields        
+                  void InterfaceMethod();
+             }
+
+             abstract class AClass
+             {
+                  public int AbstractInt;
+
+                  protected AClass() // modifier is required
+                  {
+                      AbstractInt = 1;
+                      Console.WriteLine("  -  aClass: constructor: " + AbstractInt);
+                  }
+
+                  abstract public void AbstractMethod(); // implementation is prohibited
+
+                  virtual public void VirtualMethod() //must be implemented
+                  {
+                      Console.WriteLine("  -  aClass: virtualMethod: " + AbstractInt);
+                  }
+
+                  public void NotAbstractInAbstractMethod()
+                  {
+                      Console.WriteLine("  -  aClass: notAbstractInAbstractMethod: " + AbstractInt);
+                  }
+             }
+
+             class EClass : AClass, IClass
+             {
+                  public new int AbstractInt = 2; // Note! It is not override old field, it also cover it.
+                  public EClass()
+                      : base() // Even if you doesn&#39;t write it, the old default constructor will be called. 
+                  {
+                      AbstractInt = 3;
+                      Console.WriteLine("  -  eClass: constructor: " + AbstractInt);
+                  }
+
+                  public override void AbstractMethod() // abstract methods must be overrided
+                  {
+                      Console.WriteLine("  -  eClass: abstractMethod: " + AbstractInt);
+                  }
+
+                  public override void VirtualMethod()
+                  // One may not implement. Without override modifier it is also covering 
+                  // and base method can be accessed throught the base class
+                  {
+                      base.VirtualMethod();
+                      Console.WriteLine("  -  eClass: virtualMethod: " + AbstractInt);
+                  }
+
+                  public new void NotAbstractInAbstractMethod() 
+                  // Method also covered, so the base method can be accessed throught the base class
+                  {
+                      Console.WriteLine("  -  eClass: notAbstractInAbstractMethod: " + AbstractInt);
+                  }
+
+                   public void InterfaceMethod()
+                  // Can&#39;t escape from implementation.
+                  {
+                      Console.WriteLine("  -  eClass: interfaceMethod: " + AbstractInt);
+                  }
+             }
+
+             class Program
+             {
+                  static void Main()
+                  {
+                      Console.WriteLine("eClass e = new eClass():  ");
+                      EClass e = new EClass();
+                      AClass a = e;
+                      Console.WriteLine("e.abstractMethod():  ");
+                      e.AbstractMethod();
+                      Console.WriteLine("e.e.notAbstractInAbstractMethod():  ");
+                      e.NotAbstractInAbstractMethod();
+                      Console.WriteLine("e.virtualMethod():  ");
+                      e.VirtualMethod();
+                      Console.WriteLine("e.interfaceMethod():  ");
+                      e.InterfaceMethod();
+                      Console.WriteLine("a.abstractMethod():  ");
+                      a.AbstractMethod();
+                      Console.WriteLine("a.notAbstractInAbstractMethod():  ");
+                      a.NotAbstractInAbstractMethod();
+                      Console.WriteLine("a.virtualMethod():  ");
+                      a.VirtualMethod();
+                      Console.ReadKey();
+                      return;
+                  }
+             }
+        }
+```
+
+Output:
+
+```
+        eClass e = new eClass():
+          -  aClass: constructor: 1
+          -  eClass: constructor: 3
+        e.abstractMethod():
+          -  eClass: abstractMethod: 3
+        e.e.notAbstractInAbstractMethod():
+          -  eClass: notAbstractInAbstractMethod: 3
+        e.virtualMethod():
+          -  aClass: virtualMethod: 1
+          -  eClass: virtualMethod: 3
+        e.interfaceMethod():
+          -  eClass: interfaceMethod: 3
+        a.abstractMethod():
+          -  eClass: abstractMethod: 3
+        a.notAbstractInAbstractMethod():
+          -  aClass: notAbstractInAbstractMethod: 1
+        a.virtualMethod():
+          -  aClass: virtualMethod: 1
+          -  eClass: virtualMethod: 3
+```
