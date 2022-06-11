@@ -6,18 +6,8 @@ date: May 03 2012
 <p>If you need a custom control you can make it in an easyest way using other controls you have and make connection between them in code behind. But here are probably few disadvantages like hard connection between logic and view and imposibility for customization control's view in the future. That's why if you want to use you control more than once it is better to make templated control.</p>
 
 <p>I show templated custom control creation using packman as example.</p>
-<object id="SilverlightPlugin1" 
-    data="data:application/x-silverlight-2," 
-    type="application/x-silverlight-2" >
-    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
-    <!-- Display installation image. -->
-    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
-        style="text-decoration: none;">
-        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
-            alt="Get Microsoft Silverlight" 
-            style="border-style: none"/>
-    </a>
-</object>
+<img src="/templated-custom-controls-in-xaml/1.gif">
+
 <p><b>Firstable we have to define control properties.</b> Packman has parameters: size and mouth angle. So we have to create two properties: Size and MouthAngle. In the future we propably want to bind to this properties so it's better if we make this properties as dependecy properties.</p>
 <p>Dependency Property can be registred only in the class inherited from DependencyObject. DependencyObject contains control's properties dictionary, this dictionary uses DependencyProperty as key and propery value as value. Using methods GetValue and SetValue we can access to this dictionary. Should notice that when you register Dependency Property, current value at the dictionary doesn't initializes, so we can have a lot of propertyes in the control but it still have small size in the memory.</p>
 <p>DefaultStyleKey defines style type that must be aplied as default</p>
@@ -124,19 +114,8 @@ date: May 03 2012
 </code></pre>
 
 <p>Now we have pacman sceleton, but properties Size and MouthAngle doesn't do anything.</p>
-
-<object id="SilverlightPlugin1"
-    data="data:application/x-silverlight-2," 
-    type="application/x-silverlight-2" >
-    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight1.xap"/>
-    <!-- Display installation image. -->
-    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
-        style="text-decoration: none;">
-        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
-            alt="Get Microsoft Silverlight" 
-            style="border-style: none"/>
-    </a>
-</object>
+<img src="/templated-custom-controls-in-xaml/2.png">
+<a href="/templated-custom-controls-in-xaml/PacmanSilverlight1.xap">Silverlight example</a>
 
 <p><b>After that we have to bound control properties in the template.</b>
 <br />With properties With and Height of the parent Grid we can limit pacman's size. Only thin we need is to make: Grid.Width=PacmanControl.Size and Grid.Height=PacmanControl.Size.
@@ -151,18 +130,8 @@ date: May 03 2012
 
 <p>If you run current example you'll see pacman. And can resize it using Size property. </p>
 
-<object id="SilverlightPlugin1"
-    data="data:application/x-silverlight-2," 
-    type="application/x-silverlight-2" >
-    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight2.xap"/>
-    <!-- Display installation image. -->
-    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
-        style="text-decoration: none;">
-        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
-            alt="Get Microsoft Silverlight" 
-            style="border-style: none"/>
-    </a>
-</object>
+<img src="/templated-custom-controls-in-xaml/3.png">
+<a href="/templated-custom-controls-in-xaml/PacmanSilverlight2.xap">Silverlight example</a>
 
 <p><b>Dificalties in the control's properties bounding.</b>
 <br />Next thing we may want to do is to add mouth angle changing. In the other words we want to rotate semicircles. We can make it with transformations (RenderTransform and class RotateTransform). Let's add RotateTrnsform classes TopRotator and BotRotator to semicircles:</p>
@@ -312,18 +281,8 @@ date: May 03 2012
 
 <p><i><b>Congratulations:</b> At this moment we have fully working pacman. And we can change it's size and mouth angle dynamicly.</i></p>
 
-<object id="SilverlightPlugin1" 
-    data="data:application/x-silverlight-2," 
-    type="application/x-silverlight-2" >
-    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight3.xap"/>
-    <!-- Display installation image. -->
-    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
-        style="text-decoration: none;">
-        <img src="http://go.microsoft.com/fwlink/?LinkId=161376" 
-            alt="Get Microsoft Silverlight" 
-            style="border-style: none"/>
-    </a>
-</object>
+<img src="/templated-custom-controls-in-xaml/4.png">
+<a href="/templated-custom-controls-in-xaml/PacmanSilverlight3.xap">Silverlight example</a>
 
 <p><b>Reaction on user action</b>
 <br />There is only one thing we haven't done, it's some reaction on hovering and mouse pressing.
@@ -429,10 +388,11 @@ date: May 03 2012
                          ...
 </code></pre>
 
+<img src="/templated-custom-controls-in-xaml/1.gif">
 <object id="SilverlightPlugin1"
     data="data:application/x-silverlight-2," 
     type="application/x-silverlight-2" >
-    <param name="source" value="/data/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
+    <param name="source" value="/templated-custom-controls-in-xaml/PacmanSilverlight4.xap"/>
     <!-- Display installation image. -->
     <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=4.0.60310.0" 
         style="text-decoration: none;">
