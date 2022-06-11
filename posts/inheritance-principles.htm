@@ -3,16 +3,15 @@ title: Inheritance principles in practice
 description: "This code demonstate's some important principles in inheritance that beginners often forget."
 date: Jun 1 2010
 ---
+<p>&raquo; Use the override modifier when the base entity is marked as abstract, virtual or override.</p>
+<p>&raquo; An interface contains only the signatures of methods, properties, events or indexers. All members are public by default.</p>
+<p>&raquo; When you inherit some class, the base constructor will be called in automatic mode if its without parameters, otherwise it shows you an error because compiler don&#39;t know what parameters sould be placed to the base class constructor.</p>
+<p>&raquo; When you cover some method, field or property it can be accessed throught the base class.</p>
 
-- Use the override modifier when the base entity is marked as abstract, virtual or override.
 
-- An interface contains only the signatures of methods, properties, events or indexers. All members are public by default.
 
-- When you inherit some class, the base constructor will be called in automatic mode if its without parameters, otherwise it shows you an error because compiler don't know what parameters sould be placed to the base class constructor.
+<pre><code>
 
-- When you cover some method, field or property it can be accessed throught the base class.
-
-```cs
         using System;
 
         namespace ConsoleApplication1
@@ -108,11 +107,11 @@ date: Jun 1 2010
                   }
              }
         }
-```
+ </code></pre>
 
-Output:
+<p>Output:</p>
 
-```
+<pre><code>
         eClass e = new eClass():
           -  aClass: constructor: 1
           -  eClass: constructor: 3
@@ -132,4 +131,4 @@ Output:
         a.virtualMethod():
           -  aClass: virtualMethod: 1
           -  eClass: virtualMethod: 3
-```
+ </code></pre>

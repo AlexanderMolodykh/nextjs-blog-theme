@@ -53,7 +53,7 @@ export default function PostPage({
         </header>
         <main>
           <article className="prose dark:prose-dark">
-            <MDXRemote {...source} components={components} />
+		    <div dangerouslySetInnerHTML={{ __html: source }} />
           </article>
         </main>
         <div className="grid md:grid-cols-2 lg:-mx-24 mt-12">
@@ -118,7 +118,7 @@ export const getStaticProps = async ({ params }) => {
 export const getStaticPaths = async () => {
   const paths = postFilePaths
     // Remove file extensions for page paths
-    .map((path) => path.replace(/\.mdx?$/, ''))
+    .map((path) => path.replace(/\.htm?$/, ''))
     // Map the path into the static paths object required by Next.js
     .map((slug) => ({ params: { slug } }));
 

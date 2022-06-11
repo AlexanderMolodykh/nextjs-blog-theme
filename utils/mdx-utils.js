@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { serialize } from 'next-mdx-remote/serialize';
 import rehypePrism from '@mapbox/rehype-prism';
+import hljs from 'highlight.js';
 
 // POSTS_PATH is useful when you want to get the path to a specific file
 export const POSTS_PATH = path.join(process.cwd(), 'posts');
@@ -11,7 +12,7 @@ export const POSTS_PATH = path.join(process.cwd(), 'posts');
 export const postFilePaths = fs
   .readdirSync(POSTS_PATH)
   // Only include md(x) files
-  .filter((path) => /\.mdx?$/.test(path));
+  .filter((path) => /\.htm?$/.test(path));
 
 export const sortPostsByDate = (posts) => {
   return posts.sort((a, b) => {
@@ -39,26 +40,22 @@ export const getPosts = () => {
 };
 
 export const getPostBySlug = async (slug) => {
-  const postFilePath = path.join(POSTS_PATH, `${slug}.mdx`);
+  const postFilePath = path.join(POSTS_PATH, `${slug}.htm`);
   const source = fs.readFileSync(postFilePath);
 
   const { content, data } = matter(source);
-
-  const mdxSource = await serialize(content, {
-    // Optionally pass remark/rehype plugins
-    mdxOptions: {
-      remarkPlugins: [],
-      rehypePlugins: [rehypePrism],
-    },
-    scope: data,
-  });
+  const regexp = /<code.*?>([\s\S]*?)<\/code>/g;
+  const mdxSource = content.replace(regexp, function(match, contents, offset, input_string)
+    {
+        return hljs.highlightAuto(contents.toString()).value;
+    });
 
   return { mdxSource, data, postFilePath };
 };
 
 export const getNextPostBySlug = (slug) => {
   const posts = getPosts();
-  const currentFileName = `${slug}.mdx`;
+  const currentFileName = `${slug}.htm`;
   const currentPost = posts.find((post) => post.filePath === currentFileName);
   const currentPostIndex = posts.indexOf(currentPost);
 
@@ -66,7 +63,7 @@ export const getNextPostBySlug = (slug) => {
   // no prev post found
   if (!post) return null;
 
-  const nextPostSlug = post?.filePath.replace(/\.mdx?$/, '');
+  const nextPostSlug = post?.filePath.replace(/\.htm?$/, '');
 
   return {
     title: post.data.title,
@@ -76,7 +73,7 @@ export const getNextPostBySlug = (slug) => {
 
 export const getPreviousPostBySlug = (slug) => {
   const posts = getPosts();
-  const currentFileName = `${slug}.mdx`;
+  const currentFileName = `${slug}.htm`;
   const currentPost = posts.find((post) => post.filePath === currentFileName);
   const currentPostIndex = posts.indexOf(currentPost);
 
@@ -84,7 +81,7 @@ export const getPreviousPostBySlug = (slug) => {
   // no prev post found
   if (!post) return null;
 
-  const previousPostSlug = post?.filePath.replace(/\.mdx?$/, '');
+  const previousPostSlug = post?.filePath.replace(/\.htm?$/, '');
 
   return {
     title: post.data.title,

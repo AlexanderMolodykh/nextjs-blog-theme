@@ -1,0 +1,94 @@
+---
+title: Animation in XAML (Silverlight 5, WPF, Windows 8 METRO)
+description: "How to make animation in XAML. Storyboard. Animation based on attribute change. Frame based animation."
+date: Apr 08 2012
+---
+<h2>Storyboard</h2>
+<p>Storyboard is a controller that manages animation.</p>
+<p>Storyboard containns timer that starts ticking after "Storyboard.BeginTime" time, during "Storyboard.Duration" time. 
+<br />If you define "AutoReverse" property, animation duration will be doubled automatically.
+<br />So if you want to calculate animation duraction, it would be "BeginTime + Duration / SpeedRatio" if "AutoReverse" property is false and "BeginTime + Duration / SpeedRatio * 2" in the other case.</p>
+<p>Storyboard also provides some method that allows managing animation (play, stop, seek, get current time and so on)</p>
+<p>The "Children" property contains an list of animation describers.</p>
+
+<h2>Animation describers</h2>
+<p>Animation describers it's some amount of data that describes how object properties must change their values during animation time.</p>
+<p>There are two types of animation in Silverlight: 
+<ul>
+<li><b>From/To/By animations</b> - this animation types are describing first and last object state for current animation cycle;</li>
+<li><b>Key-frame animations</b> - this type of animation are describing object states by each moment of time.</li>
+</ul>
+</p>
+<p>Animation is going acording to the some control property. These properties can be a numeric values, color or point.</p>
+<p>Storyboard provides easy way to animate color and motion fluently. It is animation for color, numeric and pont values.</p>
+<p>As you might guess Silverlight doesn't provide animation for any other property types because it isn't avident how other propertie types should describe intermediate values.</p>
+
+<h2>Describing "From/To/By" based animation</h2>
+<p>There are some classes which are describing animation parameters.
+<ul>
+<li>Color animation describes - <b>ColorAnimation</b></li>
+<li>Numeric values animation - <b>DoubleAnimation</b></li>
+<li>Point values (X,Y) - <b>PointAnimation</b></li>
+</ul>
+</p>
+<p>To make animation of this type, you have to define such animation parameters:
+<br /> <b>"From"</b> - defines starting property value  <i>(this propertie equals to current value if you not define it)</i>; 
+<br /> <b>"To"</b> - final value <i>(equals to value thet was defined in control)</i>;
+<br /> <b>"Duration"</b> - the animation duration (length). </p>
+<p>Difference in default values between <b>"From"</b> and <b>"To"</b>: Default value for "From" is the value on which last animation was stoped and default value for "To" is the value that was assigned to control. 
+<br />For example: if we had defined for control value 40px and last animation has changed it to 20px, our properties for animation would have such default values: From=20px, To=40px. It helps making fluent transition between different animations.</p>
+<p>Note: In Windows 8 METRO application the From and To default values are defining only on storyboard loading so sometimes it leads to incorrect animation working (when you are chenging properties in runtime). In  Silverlight and WPF it works fine.</p>
+<p>There are some other additional properties that allows you to delay your animation start, define incrementation for current value, make animation reversable and the other stuf you can read about in the documentation.</p>
+<p>The record below describes how to animate "Width" propery of "MyAnimatedShape". It animates this property from 100 to 300 with duration in 1 second.</p>
+<pre><code>
+            <DoubleAnimation 
+                Storyboard.TargetName="MyAnimatedShape" 
+                Storyboard.TargetProperty="Width"
+                From="100"
+                To="300" 
+                Duration="0:0:1" />
+</code></pre>
+<p>Color animation are making the same way. Property "To" in this case describes color. But how do we get animation for "Fill" property of circle object if it isn't a color? Fill property is a Brush.
+<br />It resolves very easy. We can define property from property in animation TargetProperty (actually we can make property chain with any level of imlicity).
+<br />Property in chains splitted by dots, every property in this chain describes with such structure (Class.Property). I.e. to describe "Fill" property of Ellipse type you have to use this (Ellipse.Fill), to describe property "Color" of SolidColorBrush you have to use it (SolidColorBrush.Color) and if you want to make properties chain you have to use such string "(Ellipse.Fill).(SolidColorBrush.Color)". 
+<br />You can also use array accessors in this string</p>
+<p>Color animation for solid color brush:</p>
+<pre><code>
+            <ColorAnimation 
+                Storyboard.TargetName="MyAnimatedCircle"
+                Storyboard.TargetProperty="(Ellipse.Fill).(SolidColorBrush.Color)"
+                To="Orange"
+                Duration="0:0:1" />
+</code></pre>
+<p>Color animation for linear gradient brush:</p>
+<pre><code>
+            <ColorAnimation 
+                Storyboard.TargetName="MyAnimatedCircle"
+                Storyboard.TargetProperty="(Ellipse.Fill).(LinearGradientBrush.GradientStops)[0].(GradientStop.Color)"
+                To="Orange"
+                Duration="0:0:1" />       
+</code></pre>
+
+<h2>Describing frame based animations.</h2>
+<p>Sometimes you have to make difficult animation, even something like cartoons. In this case you have to use animation based on key-frames. 
+<br />Key-frame describes value/state of the object property at the one moment of time. E.g. "Width" property must be set to 100 at 0 second, 300 at 1 second and come back to 100 at 2 second.</p>
+<p>This animation is describing same as "From/To/By animations" with only one exception, insted of "From" and "To" values it uses colection of the values and time when this value must be showed, e.g:</p>
+<pre><code>
+            <DoubleAnimationUsingKeyFrames
+                Storyboard.TargetName="MyAnimatedCircle" 
+                Storyboard.TargetProperty="Width">
+                <DiscreteDoubleKeyFrame KeyTime="0" Value="100" />
+                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="300" />
+                <LinearDoubleKeyFrame KeyTime="0:0:2" Value="100" />                
+            </DoubleAnimationUsingKeyFrames>
+</code></pre>
+<p>This animation doing the same as en animation example for DoubleAnimation described above except returning width value 100 at 2 sec. time.</p>
+<p>There are four classes for describing key based animation:
+<ul>
+<li>Color animation describes - <b>ColorAnimationUsingKeyFrames</b></li>
+<li>Numeric values animation - <b>DoubleAnimationUsingKeyFrames</b></li>
+<li>Point values (X,Y) - <b>PointAnimationUsingKeyFrames</b></li>
+<li>Any object values - <b>ObjectAnimationUsingKeyFrames</b></li>
+</ul>
+All animation describers except "ObjectAnimationUsingKeyFrames" support fluent animation between frames.
+</p>

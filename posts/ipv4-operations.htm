@@ -3,10 +3,10 @@ title: Helper for IPv4 operations
 description: "This class implements some operations with IP adress. For example '192.168.0.255' + 1 = '192.168.1.0'."
 date: Jul 5 2010
 ---
+<p>P.S.: Standart IPAddress class has "Adress" property for getting IP as "long" that is marked as deprecated so I relize it by my self.</p>
 
-P.S.: Standart IPAddress class has "Adress" property for getting IP as "long" that is marked as deprecated so I relize it by my self.
+<pre><code>
 
-```cs
         static class IPOperations
         {
             /// <summary>
@@ -99,4 +99,4 @@ P.S.: Standart IPAddress class has "Adress" property for getting IP as "long" th
                 return ToUInt(ip1) - ToUInt(ip2);
             }
         }
-```
+</code></pre>

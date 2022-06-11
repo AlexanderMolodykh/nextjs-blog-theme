@@ -1,19 +1,15 @@
 ---
 title: Templated custom controls in XAML (Windows 8)
-description: "Making templated XAML control under Windows 8 METRO. Difference between WPF and Windows 8."
+description: "Making templated XAML control under Windows 8 METRO. Difference between WPF and Windows 8. Way to manage the issues."
 date: May 16 2012
 ---
-Example for [.NET UserGroup](http://donetsk-usergroup.blogspot.com/2012/04/net-user-group.html) meeting.
+<p>Example for <a href="http://donetsk-usergroup.blogspot.com/2012/04/net-user-group.html">.NET UserGroup</a> event.</p>
+<p>Making templated XAML control under Windows 8 METRO are the same as for WPF or Silverlight. So the theory you can read from my <a href="/posts/templated-control-xaml/">previouse article</a>.
+<br>Of course there are some differences present. Differences that I found described in current article.</p>
+<p>I'll move control described in the <a href="/posts/templated-control-xaml/">previouse article</a> from WPF/Silverlight to Windows 8 METRO application.</p>
 
-Making templated XAML control under Windows 8 METRO are the same as for WPF or Silverlight. So the theory you can read from my  [previouse article](/posts/animation-in-xaml/).
-Of course there are some differences present. Differences that I found described in current article.
-
-I'll move control described in the  [previouse article](/posts/animation-in-xaml/) from WPF/Silverlight to Windows 8 METRO application.
-
-
-First stage the same:
-
-```cs
+<p>First stage the same:</p>
+<pre><code>
         public sealed class PacmanControl : Control
         {
             public static readonly DependencyProperty SizeProperty =
@@ -41,11 +37,10 @@ First stage the same:
                 DefaultStyleKey = typeof(PacmanControl);
             }
         }
-```
+</code></pre>
 
-Second stage the same too:
-
-```xml
+<p>Second stage the same too:</p>
+<pre><code>
         <Style TargetType="Pacman:PacmanControl">
             <Setter Property="Template">
                 <Setter.Value>
@@ -97,32 +92,28 @@ Second stage the same too:
                 </Setter.Value>
             </Setter>
         </Style>
-```
+</code></pre>
 
-Template bindings are working too:
-
-```xml
+<p>Template bindings are working too:</p>
+<pre><code>
                     <ControlTemplate TargetType="Pacman:PacmanControl">
                         <Grid                                
                             Width="{TemplateBinding Size}"
                             Height="{TemplateBinding Size}">
                                ...
-```
+</code></pre>
 
-Some transformations in Windows 8 was changed (LayoutTransform changed to RenderTransform). But Rotate transform still present:
-
-```xml
+<p>Some transformations in Windows 8 was changed (LayoutTransform changed to RenderTransform). But Rotate transform still present:</p>
+<pre><code>
                                 <Path.RenderTransform>
                                     <RotateTransform />
                                 </Path.RenderTransform>
-```
+</code></pre>
 
-But in Windows 8 we can't change RotateTransform using direct access to the class. IOW: when you get topRotator instance using GetTemplateChild and change its properties it doesn't make any effect on figure. We have to access parent container
-
-
-Next step should look like it:
-
-```cs
+<p>But in Windows 8 we can't change RotateTransform using direct access to the class. IOW: when you get topRotator instance using GetTemplateChild and change its properties it doesn't make any effect on figure. We have to access parent container
+</p>
+<p>Next step should look like it:</p>
+<pre><code>
     [TemplatePart(Name = TopChew, Type = typeof(Path))]
     [TemplatePart(Name = BotChew, Type = typeof(Path))]
     public class PacmanControl : Control
@@ -140,11 +131,10 @@ Next step should look like it:
             _botChew = GetTemplateChild(BotChew) as Path;
         }
     }
-```
+</code></pre>
 
-With property changed:
-
-```cs
+<p>With property changed:</p>
+<pre><code>
     [TemplatePart(Name = TopChew, Type = typeof(Path))]
     [TemplatePart(Name = BotChew, Type = typeof(Path))]
     public class PacmanControl : Control
@@ -207,11 +197,10 @@ With property changed:
             }
         }
     }
-```
+</code></pre>
 
-Changing visual states still the same:
-
-```cs
+<p>Changing visual states still the same:</p>
+<pre><code>
         public PacmanControl()
         {
             DefaultStyleKey = typeof(PacmanControl);
@@ -221,17 +210,16 @@ Changing visual states still the same:
             PointerPressed += (sender, args) => VisualStateManager.GoToState(this, "Pressed", true);
             PointerReleased += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
         }
-```
-
-```cs
+</code></pre>
+<pre><code>
     [TemplateVisualState(Name = "Normal")]
     [TemplateVisualState(Name = "MouseOver")]
     [TemplateVisualState(Name = "Pressed")]
-```
+</code></pre>
 
-We cant access to topRotator from animation too. You have to access parent container "BotChew" with "(Path.RenderTransform).(RotateTransform.Angle)".
+<p>We cant access to topRotator from animation too. You have to access parent container "BotChew" with "(Path.RenderTransform).(RotateTransform.Angle)".</p>
 
-```xml
+<pre><code>
                     <ControlTemplate TargetType="Pacman:PacmanControl">
                         <Grid Width="{TemplateBinding Size}" Height="{TemplateBinding Size}">
                             <VisualStateManager.VisualStateGroups>
@@ -311,7 +299,6 @@ We cant access to topRotator from animation too. You have to access parent conta
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                          ...
-```
+</code></pre>
 
-Source code you can find here [Pacman control for windows 8](https://Prof-MAG@github.com/Prof-MAG/pacman_windows_8.git)
-
+<p>Source code you can find here <a href="https://Prof-MAG@github.com/Prof-MAG/pacman_windows_8.git">Pacman control for windows 8</a></p>
