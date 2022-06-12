@@ -130,19 +130,18 @@ catch (FaultException&lt;SomeFault&gt; e).
 <p><b>Duplex or Callback Message Exchange Pattern</b> is an asyncronous way of comunication. Client sends a request without waiting response but having the result of operation as callback from the server side. IOW it is a Request-Reply Pattern without hanging the client thread.</p>
 <p>
 One-Way pattern can be easily implemented by setting IsOneWay property in your operation contract.
-<code>
-<pre class="prettyprint">
+<pre class="prettyprint"><code>
 [OperationContract(IsOneWay = true)]
 void LogAction(string action);
-</pre>
-</code>
+</code></pre>
+
 </p>
 <p>Duplex pattern is a bit harder. You have to have two interfaces, the service interface and the callback interface. Both operations have to marked as OneWay and a service must know the callback contract interface.
 <pre><code>
         [ServiceContract(CallbackContract=typeof(ILoggingServiceCallback))]
         public interface ILoggingService
         {
-            [OperationContract(IsOneWay = true)]
+		    [OperationContract(IsOneWay = true)]
             void LogAction(string action);
         }
 

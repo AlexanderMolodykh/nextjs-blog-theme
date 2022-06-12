@@ -1,5 +1,5 @@
 import '../styles/globals.css';
-import 'prismjs/themes/prism-tomorrow.css';
+import 'highlight.js/styles/dark.css';
 
 function MyApp({ Component, pageProps }) {
   return (
