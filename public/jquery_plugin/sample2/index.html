@@ -1,0 +1,176 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js" type="text/javascript"></script>
+	<!--script src="http://code.jquery.com/jquery.min.js" type="text/javascript"></script-->
+	<script src="jquery.sort_by_mag.js"></script>
+	<style type="text/css">
+	th { 
+		font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica,
+		sans-serif;
+		color: DarkSlateGray;
+		letter-spacing: 2px;
+		text-transform: uppercase;
+		text-align: left;
+		padding: 6px 6px 6px 12px;
+		cursor: hand;
+		background-color: #91AAA7;
+	}
+	td {
+		border: none;
+		padding: 6px 6px 6px 12px;
+		color: #696969;
+	}
+	.odd {
+		background-color: #C1DAD7;	
+	}
+	</style>
+	
+</head>
+<body>
+<table id="mag_sort">
+	<tr>
+		<th valign="top" align="center">Command</th>
+		<th valign="top" align="center">Description</th>
+		<th valign="top" align="center">DOS equivalent</th>
+	</tr>
+	<tr>
+		<td><strong>ls</strong></td>
+		<td>lists the content of a directory</td>
+		<td>dir</td>
+	</tr>
+	<tr>
+		<td><strong>cd</strong></td>
+		<td>change directory</td>
+		<td>cd</td>
+	</tr>
+	<tr>
+		<td><strong>cd ..</strong></td>
+		<td>parent directory</td>
+		<td>cd..</td>
+	</tr>
+	<tr>
+		<td><strong>mkdir</strong></td>
+		<td>creates a new directory</td>
+		<td>md</td>
+	</tr>
+	<tr>
+		<td><strong>rmdir</strong></td>
+		<td>eliminates a directory</td>
+		<td>deltree</td>
+	</tr>
+	<tr>
+		<td><strong>cp</strong></td>
+		<td>copy a file</td>
+		<td>copy, xcopy</td>
+	</tr>
+	<tr>
+		<td><strong>mv</strong></td>
+		<td>moves a file</td>
+		<td>move</td>
+	</tr>
+	<tr>
+		<td><strong>rm</strong></td>
+		<td>removes a file</td>
+		<td>del</td>
+	</tr>
+	<tr>
+		<td><strong>passwd</strong></td>
+		<td>changes the user's password</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>cat</strong></td>
+		<td>displays the file's content</td>
+		<td>type</td>
+	</tr>
+	<tr>
+		<td><strong>more</strong></td>
+		<td>displays the file's content with pauses</td>
+		<td>type |more</td>
+	</tr>
+	<tr>
+		<td><strong>man</strong><p align="justify"><strong>apropos</strong></p>
+		</td>
+		<td>help for the requested command</td>
+		<td>help</td>
+	</tr>
+	<tr>
+		<td><strong>lpr</strong></td>
+		<td>prints the requested file</td>
+		<td>print</td>
+	</tr>
+	<tr>
+		<td><strong>chmod</strong></td>
+		<td>changes the attribute of a file<p align="justify"><em><strong>chmod XXX file</strong></em></p>
+		<p align="justify">XXX= User|Group|Other where X represents an integer 1&lt;X&lt;7</p>
+		<br/>Read=4, Write=2, Run=1 <br/>X=Read+Write+Run <br/>0 means no rights <br/>1 means <i>running</i> right <br/>2 means <i>writing</i> right <br/>3 means <i>writing and running</i> rights <br/>4 means <i>reading</i> right <br/>5 means <i>reading and running</i> rights <br/>6 means <i>reading and writing</i> rights <br/>7 means all rights
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>chfn</strong></td>
+		<td>changes the personal information viewed with finger</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>chsh</strong></td>
+		<td>changes the shell: <em><strong>chsh user emplacement_du_shell</strong></em></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>finger</strong></td>
+		<td>lists online users </td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>traceroute</strong></td>
+		<td>traces the route between the local and distant machine</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><a href="../internet/protocol.php3"><strong>ftp</strong></a><strong>
+		[machine] [port]</strong><p align="justify"><strong>get</strong></p>
+		<p align="justify"><strong>put</strong></p>
+		<p align="justify"><strong>quit</strong></p>
+		</td>
+		<td>transfers the file betwee the local machine and the target machine<p align="justify">recovers a file</p>
+		<p align="justify">sends a file</p>
+		<p align="justify">quits the FTP session</p>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>telnet [machine]</strong></td>
+		<td>performs a <a href="../internet/protocol.php3">telnet</a></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>talk</strong></td>
+		<td>allows to talk to a connected user<p align="justify">talk user</p>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>mesg</strong></td>
+		<td>authorizes or rejects the talk command <p align="justify"><em><strong>mesg n</strong></em><strong>
+		: </strong>Starts receiving <strong>talk</strong> messages</p>
+		<p align="justify"><em><strong>mesg y</strong></em><strong>: </strong>Allows the receipt of <strong>talk</strong> messages</p>
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td><strong>logout</strong></td>
+		<td>disconnection</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+
+<p>Table of content for the example was taken from the <a href="http://en.kioskea.net/contents/linux/lincomm.php3">http://en.kioskea.net</a>.</p>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+	        $('#mag_sort').sort_by_mag();
+		});
+	</script>	
+</body>
+</html>
