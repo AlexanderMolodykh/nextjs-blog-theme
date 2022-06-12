@@ -8,7 +8,8 @@ date: May 03 2012
 <p>I show templated custom control creation using packman as example.</p>
 <img src="/templated-custom-controls-in-xaml/1.gif">
 
-<p><b>Firstable we have to define control properties.</b> Packman has parameters: size and mouth angle. So we have to create two properties: Size and MouthAngle. In the future we propably want to bind to this properties so it's better if we make this properties as dependecy properties.</p>
+<h2>1. We have to define control properties.</h2>
+<p>Packman has parameters: size and mouth angle. So we have to create two properties: Size and MouthAngle. In the future we propably want to bind to this properties so it's better if we make this properties as dependecy properties.</p>
 <p>Dependency Property can be registred only in the class inherited from DependencyObject. DependencyObject contains control's properties dictionary, this dictionary uses DependencyProperty as key and propery value as value. Using methods GetValue and SetValue we can access to this dictionary. Should notice that when you register Dependency Property, current value at the dictionary doesn't initializes, so we can have a lot of propertyes in the control but it still have small size in the memory.</p>
 <p>DefaultStyleKey defines style type that must be aplied as default</p>
 
@@ -42,9 +43,9 @@ date: May 03 2012
         }
 </code></pre>
 
-<p>Note: Make all properties in your custom control as dependency properties. In 99% you might want to bin them in the future. 
+<p><b>Note:</b> Make all properties in your custom control as dependency properties. In 99% you might want to bind them in the future. 
 </br>Binding wouldn't work if your control doesn't inherit from the FrameworkElement class. Control class inherits from FrameworkElement that's why bindings must work.</p>
-<p>Note: if you won't define DefaultStyleKey it will be equaled to typeof(Control) (This assignment appears in the Control class constructor.) And default style will be style with type Control insted of PacmanControl.</p>
+<p><b>Note:</b> if you won't define DefaultStyleKey it will be equaled to typeof(Control) (This assignment appears in the Control class constructor.) And default style will be style with type Control insted of PacmanControl.</p>
 
 <p>Now we have PacmanControl that we can use in the XAML. Only thing is it won't show anything.</p>
 <pre><code>
@@ -54,9 +55,10 @@ date: May 03 2012
             Size="100" />
 </code></pre>
 
-<p><b>Next we have to create template for this control.</b> Template it's view of control. For template attaching we have to define "Template" property. It can be done with styles.
-<br />As you might know higher priority in the defining Template property directly, next - from style.</p>
-<p>You must be curious about how standart controls are having good look even if you not define template in your application? That's because XAML engine looks at the assembly where control was defined and searching resource with name "Generic.xaml". When it founds the XAML engine applyes styles from it.</p>
+<h2>2. We have to create template for this control.</h2>
+<p>Template is a view of control. In order to attach template we have to define "Template" property. It can be done with styles.
+<br />As you might know, when you define Template property directly, it overrides template that defined in style.</p>
+<p><b>Note:</b> You must be curious about how standart controls are having good look even if you not define template in your application? That's because XAML engine looks at the assembly where control was defined and searching resource with name "Generic.xaml". When it founds the XAML engine applyes styles from it.</p>
 
 <p>Pacman's face consists of two semicirles and eye:</p>
 <pre><code>
@@ -113,12 +115,13 @@ date: May 03 2012
         </Style>
 </code></pre>
 
-<p>Now we have pacman sceleton, but properties Size and MouthAngle doesn't do anything.</p>
+<p>Now we have pacman sceleton, but properties Size and MouthAngle don't do anything.</p>
 <img src="/templated-custom-controls-in-xaml/2.png">
 <a href="/templated-custom-controls-in-xaml/PacmanSilverlight1.xap">Silverlight example</a>
 
-<p><b>After that we have to bound control properties in the template.</b>
-<br />With properties With and Height of the parent Grid we can limit pacman's size. Only thin we need is to make: Grid.Width=PacmanControl.Size and Grid.Height=PacmanControl.Size.
+<h2>3. Bound control properties in the template.</h2>
+<h3>3.1. Size.</h3>
+<p>With properties Width and Height of the parent Grid we can limit pacman's size. Only thin we need is to make: Grid.Width=PacmanControl.Size and Grid.Height=PacmanControl.Size.
 <br />We can solve this issue using bindings, actually TemplateBinding extension. TemplateBinding is the only way to bind to control properties from the template.</p>
 <pre><code>
                     <ControlTemplate TargetType="Pacman:PacmanControl">
@@ -128,11 +131,12 @@ date: May 03 2012
                                ...
 </code></pre>
 
-<p>If you run current example you'll see pacman. And can resize it using Size property. </p>
+<p>If you run current example you'll see pacman. And it is possible to resize it using Size property. </p>
 
 <img src="/templated-custom-controls-in-xaml/3.png">
 <a href="/templated-custom-controls-in-xaml/PacmanSilverlight2.xap">Silverlight example</a>
 
+<h3>3.1. Rotate with RotateTransform.</h3>
 <p><b>Dificalties in the control's properties bounding.</b>
 <br />Next thing we may want to do is to add mouth angle changing. In the other words we want to rotate semicircles. We can make it with transformations (RenderTransform and class RotateTransform). Let's add RotateTrnsform classes TopRotator and BotRotator to semicircles:</p>
 
@@ -276,26 +280,29 @@ date: May 03 2012
         }
 </code></pre>
 
-<p>Note: You have to make properties assignment on reqire properties changing and in OnApplyTemplate() method execution.</p>
-<p>Note: Attribute TemplatePart needs for showing designer/programmer/tool(Blend) that this control is expecting such classes with such names in the template. This attributes doesn't imply on the control behaviour.</p>
+<p><b>Note:</b> You have to make properties assignment on reqire properties changing and in OnApplyTemplate() method execution.</p>
+<p><b>Note:</b> Attribute TemplatePart needs for showing designer/programmer/tool(Blend) that this control is expecting such classes with such names in the template. This attributes doesn't imply on the control behaviour.</p>
 
 <p><i><b>Congratulations:</b> At this moment we have fully working pacman. And we can change it's size and mouth angle dynamicly.</i></p>
 
 <img src="/templated-custom-controls-in-xaml/4.png">
 <a href="/templated-custom-controls-in-xaml/PacmanSilverlight3.xap">Silverlight example</a>
 
-<p><b>Reaction on user action</b>
-<br />There is only one thing we haven't done, it's some reaction on hovering and mouse pressing.
+<h2>4. Reaction on user action.</h2>
+<p>There is only one thing we haven't done, it's some reaction on hovering and mouse pressing.
 <br />We can provide it with visual states.</p>
 
-<p><b>VisualStates</b> are containing in the VisualStateGroup class that connects to controls with "VisualStateManager.VisualStateGroups" attached property. VisualStateGroup property is some kind of dictionary where key is a string and value is an animation. Using this key you can access associated animation and start it, method VisualStateManager.GoToState is doing it. If dictionary doesn't contain requested key it won't throw any exception. Let's assign "Normal", "MouseOver", "Pressed" visual states according to some user actions:</p>
+<p><b>VisualStates</b> are containing in the VisualStateGroup class that connects to controls with "VisualStateManager.VisualStateGroups" attached property. 
+<br />VisualStateGroup property is some kind of dictionary where key is a string and value is an animation. Using this key you can access associated animation and start it, method VisualStateManager.GoToState is doing it.
+<br /><b>Note:</b> If dictionary doesn't contain requested key it won't throw any exception.</p>
+<p>Let's assign "Normal", "MouseOver", "Pressed" visual states according to some user actions:</p>
 <p>Add following to constructor:</p>
 <pre><code>
-            Loaded += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
-            MouseEnter += (sender, args) => VisualStateManager.GoToState(this, "MouseOver", true);
-            MouseLeave += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
-            MouseLeftButtonDown += (sender, args) => VisualStateManager.GoToState(this, "Pressed", true);
-            MouseLeftButtonUp += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+Loaded += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+MouseEnter += (sender, args) => VisualStateManager.GoToState(this, "MouseOver", true);
+MouseLeave += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
+MouseLeftButtonDown += (sender, args) => VisualStateManager.GoToState(this, "Pressed", true);
+MouseLeftButtonUp += (sender, args) => VisualStateManager.GoToState(this, "Normal", true);
 
 </code></pre>
 <p>And add requirements for template:</p>
@@ -305,87 +312,87 @@ date: May 03 2012
     [TemplateVisualState(Name = "Pressed")]
 </code></pre>
 
-<p><b>After that we can associate visual states with the animations.</b> About animation and storyboard you can read in my previous post: <a href="http://molodih.org.ua/articles/7/animation-in-silverlight-5">Animation in Silverlight 5</a></p>
+<p><b>After that we can associate visual states with the animations.</b> About animation and storyboard you can read in my previous post: <a href="/posts/animation-in-xaml/">Animation in Silverlight 5</a></p>
 <pre><code>
-                    <ControlTemplate TargetType="Pacman:PacmanControl">
-                        <Grid Width="{TemplateBinding Size}" Height="{TemplateBinding Size}">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CommonStates">
-                                    <VisualState x:Name="Normal">
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Duration="0:0:0.2"
-                                                Storyboard.TargetName="BotChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
-                                            <DoubleAnimation
-                                                Duration="0:0:0.2"
-                                                Storyboard.TargetName="TopChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)" />
-                                            <ColorAnimation
-                                                Duration="0:0:0.2"
-                                                Storyboard.TargetName="BotChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.Fill).(SolidColorBrush.Color)" />
-                                            <ColorAnimation
-                                                Duration="0:0:0.2"
-                                                Storyboard.TargetName="TopChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.Fill).(SolidColorBrush.Color)" />
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="MouseOver">
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                AutoReverse="True"
-                                                Duration="0:0:0.2"
-                                                From="40"
-                                                RepeatBehavior="Forever"
-                                                Storyboard.TargetName="BotChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
-                                                To="0" />
-                                            <DoubleAnimation
-                                                AutoReverse="True"
-                                                Duration="0:0:0.2"
-                                                From="-40"
-                                                RepeatBehavior="Forever"
-                                                Storyboard.TargetName="TopChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
-                                                To="0" />
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Pressed">
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Duration="0:0:0.5"
-                                                Storyboard.TargetName="BotChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
-                                                To="0" />
-                                            <DoubleAnimation
-                                                Duration="0:0:0.5"
-                                                Storyboard.TargetName="TopChew"
-                                                Storyboard.TargetProperty=
-                                                    "(Path.RenderTransform).(RotateTransform.Angle)"
-                                                To="0" />
-                                            <ColorAnimation
-                                                Duration="0:0:0.5"
-                                                Storyboard.TargetName="BotChew"
-                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
-                                                To="Red" />
-                                            <ColorAnimation
-                                                Duration="0:0:0.5"
-                                                Storyboard.TargetName="TopChew"
-                                                Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
-                                                To="Red" />
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-                         ...
+	<ControlTemplate TargetType="Pacman:PacmanControl">
+		<Grid Width="{TemplateBinding Size}" Height="{TemplateBinding Size}">
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal">
+						<Storyboard>
+							<DoubleAnimation
+								Duration="0:0:0.2"
+								Storyboard.TargetName="BotChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)" />
+							<DoubleAnimation
+								Duration="0:0:0.2"
+								Storyboard.TargetName="TopChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)" />
+							<ColorAnimation
+								Duration="0:0:0.2"
+								Storyboard.TargetName="BotChew"
+								Storyboard.TargetProperty=
+									"(Path.Fill).(SolidColorBrush.Color)" />
+							<ColorAnimation
+								Duration="0:0:0.2"
+								Storyboard.TargetName="TopChew"
+								Storyboard.TargetProperty=
+									"(Path.Fill).(SolidColorBrush.Color)" />
+						</Storyboard>
+					</VisualState>
+					<VisualState x:Name="MouseOver">
+						<Storyboard>
+							<DoubleAnimation
+								AutoReverse="True"
+								Duration="0:0:0.2"
+								From="40"
+								RepeatBehavior="Forever"
+								Storyboard.TargetName="BotChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)"
+								To="0" />
+							<DoubleAnimation
+								AutoReverse="True"
+								Duration="0:0:0.2"
+								From="-40"
+								RepeatBehavior="Forever"
+								Storyboard.TargetName="TopChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)"
+								To="0" />
+						</Storyboard>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<Storyboard>
+							<DoubleAnimation
+								Duration="0:0:0.5"
+								Storyboard.TargetName="BotChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)"
+								To="0" />
+							<DoubleAnimation
+								Duration="0:0:0.5"
+								Storyboard.TargetName="TopChew"
+								Storyboard.TargetProperty=
+									"(Path.RenderTransform).(RotateTransform.Angle)"
+								To="0" />
+							<ColorAnimation
+								Duration="0:0:0.5"
+								Storyboard.TargetName="BotChew"
+								Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+								To="Red" />
+							<ColorAnimation
+								Duration="0:0:0.5"
+								Storyboard.TargetName="TopChew"
+								Storyboard.TargetProperty="(Path.Fill).(SolidColorBrush.Color)"
+								To="Red" />
+						</Storyboard>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+		 ...
 </code></pre>
 
 <img src="/templated-custom-controls-in-xaml/1.gif">
