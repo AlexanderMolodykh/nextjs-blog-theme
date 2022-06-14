@@ -39,8 +39,11 @@ export default function PostPage({
           )}
         </header>
         <main>
-          <article className="prose dark:prose-dark text-base max-w-3xl" dangerouslySetInnerHTML={{ __html: source }}>
-
+          <article className="prose dark:prose-dark text-base max-w-md mx-auto overflow-hidden md:max-w-3xl">
+				  <div className="md:flex">
+					<div className="md:shrink-0" dangerouslySetInnerHTML={{ __html: source }}>
+					</div>
+				  </div>
           </article>
         </main>
         <div className="grid md:grid-cols-2 lg:-mx-24 mt-12">
