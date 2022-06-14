@@ -35,12 +35,12 @@ export default function PostPage({
             {frontMatter.title}
           </h1>
           {frontMatter.description && (
-            <p className="text-xl mb-4">{frontMatter.description}</p>
+            <p className="text-xl mb-4 px-3 md:px-0">{frontMatter.description}</p>
           )}
         </header>
         <main>
           <article className="prose dark:prose-dark text-base mx-auto overflow-hidden max-w-sm sm:max-w-xl md:max-w-3xl">
-				  <div className="sd:flex">
+				  <div className="sd:flex px-3 md:px-0">
 					<div className="sd:shrink-0" dangerouslySetInnerHTML={{ __html: source }}>
 					</div>
 				  </div>
