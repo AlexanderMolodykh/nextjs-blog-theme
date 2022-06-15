@@ -1,3 +1,5 @@
+import React from "react";
+import fs from 'fs';
 import {
   getPosts
 } from '../utils/posts-utils';
