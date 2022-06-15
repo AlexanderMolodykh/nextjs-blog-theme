@@ -1,10 +1,33 @@
 import React from "react";
-import {
-  getPosts
-} from '../utils/posts-utils';
+import fs from "fs";
+import path from "path";
+import matter from "gray-matter";
 
 const Sitemap = () => {
     return null;
+};
+
+// POSTS_PATH is useful when you want to get the path to a specific file
+export const POSTS_PATH = path.join(process.cwd(), 'posts');
+
+// postFilePaths is the list of all htm files inside the POSTS_PATH directory
+export const postFilePaths = fs
+  .readdirSync(POSTS_PATH)
+  .filter((path) => /\.htm?$/.test(path));
+
+export const getPosts = () => {
+  let posts = postFilePaths.map((filePath) => {
+    const source = fs.readFileSync(path.join(POSTS_PATH, filePath));
+    const { content, data } = matter(source);
+
+    return {
+      content,
+      data,
+      filePath,
+    };
+  });
+
+  return posts;
 };
 
 export const getServerSideProps = async ({ res }) => {
@@ -31,6 +54,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     res.write(sitemap);
     res.end();
 } catch (error) {
+	res.write(error);
 	res.write(error.stack);
     res.end();
 }
