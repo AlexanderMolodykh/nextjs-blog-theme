@@ -1,7 +1,6 @@
-import React from 'react';
 import {
   getPosts
-} from '../utils/mdx-utils';
+} from '../utils/posts-utils';
 
 const Sitemap = () => {
     return null;

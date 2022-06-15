@@ -4,7 +4,7 @@ import {
   getPostBySlug,
   getPreviousPostBySlug,
   postFilePaths,
-} from '../../utils/mdx-utils';
+} from '../../utils/posts-utils';
 
 import Head from 'next/head';
 import Link from 'next/link';

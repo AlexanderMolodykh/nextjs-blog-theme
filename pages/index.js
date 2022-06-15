@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getPosts } from '../utils/mdx-utils';
+import { getPosts } from '../utils/posts-utils';
 import { isIE } from "react-device-detect" 
 
 import Footer from '../components/Footer';

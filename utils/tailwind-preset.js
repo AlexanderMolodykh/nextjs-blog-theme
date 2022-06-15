@@ -40,10 +40,6 @@ module.exports = {
       },
       colors: {
         primary: 'var(--color-primary)',
-        'gradient-1': 'var(--color-gradient-1)',
-        'gradient-2': 'var(--color-gradient-2)',
-        'gradient-3': 'var(--color-gradient-3)',
-        'gradient-4': 'var(--color-gradient-4)',
       },
       fonts: {
         primary: 'var(--font-primary)',
