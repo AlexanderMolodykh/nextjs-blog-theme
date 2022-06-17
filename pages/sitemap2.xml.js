@@ -26,7 +26,7 @@ catch(e) {
     res.end();
 }
     return {
-        props: {},
+        props: { data: { "bo" }},
     };
 };
 
