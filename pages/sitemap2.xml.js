@@ -1,10 +1,10 @@
 import React from "react";
 
-const Sitemap2 = () => {
+function Sitemap2({data}) {
     return null;
 };
 
-export async function getServerSideProps (res) {
+export async function getServerSideProps ({res}) {
 try{
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
