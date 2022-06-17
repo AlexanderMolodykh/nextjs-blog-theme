@@ -45,6 +45,11 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <priority>1.0</priority>
 </url>
 <url>
+<loc>https://tech.molodykh.online/posts/order-members-with-resharper/</loc>
+<changefreq>yearly</changefreq>
+<priority>1.0</priority>
+</url>
+<url>
 <loc>https://tech.molodykh.online/posts/templated-control-xaml/</loc>
 <lastmod>Thu May 03 2012 00:00:00 GMT+0200 (czas środkowoeuropejski letni)</lastmod>
 <changefreq>yearly</changefreq>
