@@ -1,5 +1,5 @@
 import React from "react";
-import { getPosts } from '../utils/posts-utils';
+import fs from "fs";
 
 function Sitemap2({data}) {
     return null;
@@ -8,21 +8,46 @@ function Sitemap2({data}) {
 export async function getServerSideProps ({res}) {
 try{
     
-const posts = getPosts();
-const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-<url>
-<loc>https://tech.molodykh.online/posts/animation-in-xaml/</loc>
-<lastmod>Sun Apr 08 2012 00:00:00 GMT+0200 (czas środkowoeuropejski letni)</lastmod>
-<changefreq>yearly</changefreq>
-<priority>1.0</priority>
-</url>
-</urlset>
-`;
+      const baseUrl = {
+    development: "http://localhost:3000",
+    production: "https://mydomain.com",
+  }[process.env.NODE_ENV];
 
-    res.setHeader('Content-Type', 'text/xml');
-    res.write(sitemap);
-    res.end();
+  const staticPages = fs
+    .readdirSync("pages")
+    .filter((staticPage) => {
+      return ![
+        "_app.js",
+        "_document.js",
+        "_error.js",
+        "sitemap.xml.js",
+      ].includes(staticPage);
+    })
+    .map((staticPagePath) => {
+      return `${baseUrl}/${staticPagePath}`;
+    });
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      ${staticPages
+        .map((url) => {
+          return `
+            <url>
+              <loc>${url}</loc>
+              <lastmod>${new Date().toISOString()}</lastmod>
+              <changefreq>monthly</changefreq>
+              <priority>1.0</priority>
+            </url>
+          `;
+        })
+        .join("")}
+    </urlset>
+  `;
+
+  res.setHeader("Content-Type", "text/xml");
+  res.write(sitemap);
+  res.end();
+
 }
 catch(e) {
     res.write(e);
