@@ -20,6 +20,7 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
     res.setHeader('Content-Type', 'text/xml');
     res.write(sitemap);
     res.end();
+}
 catch(e) {
     res.write(e);
         res.write(e.trace);
