@@ -1,0 +1,260 @@
+---
+title: Order class members using ReSharper
+description: "If you need to orger your class members, following you copmany StyleCop rules, you can use ReSharper (Visual Studio plug-in) to achive that."
+date: Mar 07 2012
+---
+<p>In my team we are using class members ordering according to the StyleCop Rules Documentation.</li></ul></p>
+
+<p>Acording to this documentation:
+<ul>
+<li>
+Within a class, struct, or interface, elements must be positioned in the following order:
+<ul>
+<li>Constant Fields</li>
+<li>Fields</li>
+<li>Constructors</li>
+<li>Finalizers (Destructors)</li>
+<li>Delegates</li>
+<li>Events</li>
+<li>Enums</li>
+<li>Interfaces</li>
+<li>Properties</li>
+<li>Indexers</li>
+<li>Methods</li>
+<li>Structs</li>
+<li>Classes</li>
+</ul>
+</li>
+<li>
+Elements of the same type must be positioned in the following order by access level:
+<ul>
+<li>public</li>
+<li>internal</li>
+<li>protected internal</li>
+<li>protected</li>
+<li>private</li>
+</ul>
+</li>
+<li>
+All static elements must be placed above all instance elements of the same type.
+</li>
+</ul>
+</p>
+
+<p>It sometimes annoys teammembers following this rules. So I made special template for ReSharper's CodeCleanup tool that provides automatic members ordering according to the StyleCop Rules Documentation.</p>
+<p>I also add ordering by member name inside of the each member type group.</p>
+<p>To use this feature you have to: 
+<ol>
+<li>Go to ReSharper->Options->Languages->C#->TypeMemberLayouts and copy this template to the field;</li>
+<li>Go to ReSharper->Options->Tools->Code Cleanup.
+<br />Add new rule and sign "Reorder type member". I am also sign "Reformat code", "Arrange 'this' qualifier" and "Optimize using directives".</li>
+</ol>
+</p>
+<p>To run code cleanup you can use ReSharper->Tools=>Cleanup Code or use hot key Ctrl-E, C.</p>
+<p>Or you can make full solution cleanup if you left click on solution in the solution explorer window and choice "Cleanup Code".</p>
+
+<pre><code>
+<Patterns xmlns="urn:shemas-jetbrains-com:member-reordering-patterns">
+  <!--Do not reorder COM interfaces and structs marked by StructLayout attribute-->
+  <Pattern>
+    <Match>
+      <Or Weight="100">
+        <And>
+          <Kind Is="interface"/>
+          <Or>
+            <HasAttribute CLRName="System.Runtime.InteropServices.InterfaceTypeAttribute"/>
+            <HasAttribute CLRName="System.Runtime.InteropServices.ComImport"/>
+          </Or>
+        </And>
+        <HasAttribute CLRName="System.Runtime.InteropServices.StructLayoutAttribute"/>
+      </Or>
+    </Match>
+  </Pattern>
+  <!--Special formatting of NUnit test fixture-->
+  <Pattern RemoveAllRegions="true">
+    <Match>
+      <And Weight="100">
+        <Kind Is="class"/>
+        <HasAttribute CLRName="NUnit.Framework.TestFixtureAttribute" Inherit="true"/>
+      </And>
+    </Match>
+    <!--Setup/Teardow-->
+    <Entry>
+      <Match>
+        <And>
+          <Kind Is="method"/>
+          <Or>
+            <HasAttribute CLRName="NUnit.Framework.SetUpAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.TearDownAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.FixtureSetUpAttribute" Inherit="true"/>
+            <HasAttribute CLRName="NUnit.Framework.FixtureTearDownAttribute" Inherit="true"/>
+          </Or>
+        </And>
+      </Match>
+    </Entry>
+    <!--All other members-->
+    <Entry/>
+    <!--Test methods-->
+    <Entry>
+      <Match>
+        <And Weight="100">
+          <Kind Is="method"/>
+          <HasAttribute CLRName="NUnit.Framework.TestAttribute" Inherit="false"/>
+        </And>
+      </Match>
+      <Sort>
+        <Name/>
+      </Sort>
+    </Entry>
+  </Pattern>
+  <!--Default pattern-->
+  <Pattern>
+    <!--Constants-->
+    <Entry>
+      <Match>
+          <Kind Is="constant"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Readonly/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Fields-->
+    <Entry>
+      <Match>
+          <Kind Is="field"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Readonly/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Constructors. Place static one first-->
+    <Entry>
+      <Match>
+        <Kind Is="constructor"/>
+      </Match>
+      <Sort>
+        <Static/>
+        <Access Order="public internal protected-internal protected private"/>
+      </Sort>
+    </Entry>
+    <!--Destructors. Place static one first-->
+    <Entry>
+      <Match>
+        <Kind Is="destructor"/>
+      </Match>
+      <Sort>
+        <Static/>
+        <Access Order="public internal protected-internal protected private"/>
+      </Sort>
+    </Entry>
+    <!--Delegates-->
+    <Entry>
+      <Match>
+          <Kind Is="delegate"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Readonly/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!-- Events -->
+    <Entry>
+      <Match>
+        <Kind Is="event"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Readonly/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Enums-->
+    <Entry>
+      <Match>
+        <Kind Is="enum"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Readonly/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Properties-->
+    <Entry>
+      <Match>
+        <And>
+          <Kind Is="property"/>
+          <Not>
+            <Kind Is="indexer"/>
+          </Not>
+        </And>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Indexers-->
+    <Entry>
+      <Match>
+        <Kind Is="indexer"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Static/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--Methods-->
+    <Entry>
+      <Match>
+        <And>
+          <Or>
+            <Kind Is="method"/>
+            <Kind Is="operator"/>
+            <HandlesEvent/>
+          </Or>
+          <Not>
+            <Kind Is="destructor"/>
+          </Not>
+        </And>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Static/>
+        <Abstract/>
+        <Virtual/>
+        <Override/>
+        <Name/>
+      </Sort>
+    </Entry>
+    <!--all other members-->
+    <Entry/>
+    <!--nested types-->
+    <Entry>
+      <Match>
+        <Kind Is="type"/>
+      </Match>
+      <Sort>
+        <Access Order="public internal protected-internal protected private"/>
+        <Static/>
+        <Abstract/>
+        <Virtual/>
+        <Override/>
+        <Name/>
+      </Sort>
+    </Entry>
+  </Pattern>
+</Patterns>
+</code></pre>
