@@ -1,15 +1,11 @@
 import React from "react";
 import fs from "fs";
 
-function Sitemap2({data}) {
-    return null;
-};
+const Sitemap2 = () => {};
 
-export async function getServerSideProps ({res}) {
-try{
-    
-      const baseUrl = {
-    development: "http://localhost:3000",
+export const getServerSideProps = ({ res }) => {
+  const baseUrl = {
+    development: "http://localhost:5000",
     production: "https://mydomain.com",
   }[process.env.NODE_ENV];
 
@@ -48,15 +44,9 @@ try{
   res.write(sitemap);
   res.end();
 
-}
-catch(e) {
-    res.write(e);
-        res.write(e.trace);
-    res.end();
-}
-    return {
-        props: { data: { foo: "bo", },},
-    };
+  return {
+    props: {},
+  };
 };
 
 export default Sitemap2;
