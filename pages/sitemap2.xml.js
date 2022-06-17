@@ -1,4 +1,5 @@
 import React from "react";
+import { getPosts } from '../utils/posts-utils';
 
 function Sitemap2({data}) {
     return null;
@@ -6,6 +7,8 @@ function Sitemap2({data}) {
 
 export async function getServerSideProps ({res}) {
 try{
+    
+const posts = getPosts();
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
