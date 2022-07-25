@@ -53,6 +53,11 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <changefreq>yearly</changefreq>
 <priority>1.0</priority>
 </url>
+<url>
+<loc>https://tech.molodykh.online/posts/graphql-introspection/</loc>
+<changefreq>yearly</changefreq>
+<priority>1.0</priority>
+</url>
 </urlset>
 `;
 
