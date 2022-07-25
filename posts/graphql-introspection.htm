@@ -3,7 +3,8 @@ title: Explore GraphQL using introspection queries
 description: "Sometimes you need quickly check GraphQL contract and no other tools available. Sometimes you build a script that automatically grabs available resources. Here is the set of useful GraphQL introspection quieries."
 date: Jul 25 2022
 ---
-<p>GraphQL services support introspection queries. Unfortunatelly, on production environments introspections usually blocked for sequrity reasons. But I found Deuche Bahn one if don't have your own to play with https://bahnql.herokuapp.com/graphql</p>
+<p>GraphQL services support introspection queries. Unfortunatelly, on production environments introspections usually blocked for sequrity reasons. But I found Deuche Bahn one if you don't have your own to play with https://bahnql.herokuapp.com/graphql</p>
+<p><a href="/explore_service.json">Insomnia template for below examples</a></p>
 <h2>Check the list of possible queries and mutations.</h2>
 <p>
 <pre><code>
@@ -51,8 +52,7 @@ fragment TypeFields on __Type
 </code></pre>
 </p>
 
-<p>For Deuche Bahn service I got response below. I would not present all the responses - you can download insomnia template and try by yourself.</p>
-<p><a href="/explore_service.json">Insomnia template</a></p>
+<p>For Deuche Bahn service I got response below. I would not present all the responses - you can download insomnia app and try by yourself.</p>
 <p>
 <pre><code>
 {
