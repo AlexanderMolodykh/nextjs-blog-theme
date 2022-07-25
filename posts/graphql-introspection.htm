@@ -91,8 +91,8 @@ fragment TypeFields on __Type
 </code></pre>
 </p>
 
-<p>There are some queries but no mutations.</p>
-<p>Keep in mind, some nasty services would throw error for such query (when there are no mutations). Then just remove `mutationType` piece.</p>
+<p>We can see there some queries but no mutations (mutationType: null).
+<br/>Keep in mind, some nasty services would throw error for such query (when there are no mutations). Then just remove `mutationType` piece.</p>
 <p>Good services have also documentation. Just add description field into previous fragment.</p>
 <pre><code>
 fragment TypeFields on __Type
@@ -182,7 +182,7 @@ fragment TypeFields on __Type
 </p>
 
 <h2>Check complex types.</h2>
-<p>Finally, explore the types. The argument is not always a simple string on number. It often complex data structures.</p>
+<p>Finally, explore the types. The argument is not always a simple string on number. It is often some complex data structures.</p>
 <p>
 <pre><code>
 {
@@ -211,4 +211,5 @@ fragment TypeFields on __Type
 }
 </code></pre>
 </p>
-<p>It is just overview of basic GraphQL usage. In reality you can have complex classes with inheritance, unions, enums.</p>
+<p>It was just overview of basic GraphQL cases. In real life you can have more interesting cases with inheritance, unions, enums.
+<br/>Use insomnia code compleat functionality to explore them all.</p>
