@@ -27,7 +27,7 @@ date: Jul 25 2022
 }
 </code></pre>
 </p>
-<p>Or simplified version where common code moved into fragment.</p>
+<h3>Or simplified version where common code moved into fragment.</h3>
 <p>
 <pre><code>
 {
@@ -93,7 +93,7 @@ fragment TypeFields on __Type
 
 <p>We can see there some queries but no mutations (mutationType: null).
 <br/>Keep in mind, some nasty services would throw error for such query (when there are no mutations). Then just remove `mutationType` piece.</p>
-<p>Good services have also documentation. Just add description field into previous fragment.</p>
+<h3>Good services have also documentation. Just add description field into previous fragment.</h3>
 <pre><code>
 fragment TypeFields on __Type
 {
@@ -105,7 +105,7 @@ fragment TypeFields on __Type
 }
 </code></pre>
 </p>
-<p>Keep in mind, depreacted functions are not shown by default. But we can access them and check the reason it is deprecated.</p>
+<h3>Keep in mind, depreacted functions are not shown by default. But we can access them and check the reason it is deprecated.</h3>
 <pre><code>
 fragment TypeFields on __Type
 {
